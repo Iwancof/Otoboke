@@ -1,5 +1,5 @@
 [package]
-name = "OtobokeServer"
+name = "otoboke_server"
 version = "0.1.0"
 authors = ["Iwancof <rock.iwancof@gmail.com>"]
 edition = "2018"
