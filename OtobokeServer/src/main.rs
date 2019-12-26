@@ -1,6 +1,6 @@
-use std::net;
+use std::net::{self,Ipv4Addr,SocketAddr,SocketAddrV4,TcpStream};
 use std::thread;
-use std::io;
+use std::io::{self,BufRead};
 
 fn main() {
     let listener = net::TcpListener::bind("localhost:8080").unwrap();
@@ -17,18 +17,20 @@ fn main() {
     }
 } 
 
-fn handle_client(stream : net::TcpStream) {
-    let mut stream = io::BufReader::new(stream);
+fn handle_client(tcpstream : net::TcpStream) { 
+    let addr = tcpstream.peer_addr().unwrap();
 
-    let mut first_line = String::new();
-    if let Err(err) = stream.read_line(&mut first_line) {
-        panic!("error in reading first line");
-    }
-
-    let mut params = first_line.split_whitespace();
+    //read data
+    let mut stream = io::BufReader::new(tcpstream);
     
-    for e in params {
-        println!("{}",e);
+    let mut first_line = String::new();
+    if let Err(_err) = stream.read_line(&mut first_line) {
+        panic!("error in reading first line")
     }
+
+
+    println!("data = {} from {}",first_line,addr);
+    
+    //send data
 }
 
