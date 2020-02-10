@@ -55,8 +55,8 @@ public class Player : MonoBehaviour {
         ray[direction.right] = new Ray(rb.position, new Vector2(rad + mar, 0));
         ray[direction.left] = new Ray(rb.position, new Vector2(-rad - mar, 0));
 
-        foreach(var dir in Enum.GetValues(typeof(direction))) { 
-            if(Physics.Raycast(ray[i], out hit, 10.0f)) {
+        foreach(direction dir in Enum.GetValues(typeof(direction))) { 
+            if(Physics.Raycast(ray[dir], out hit, 10.0f)) {
 
             }
         }
