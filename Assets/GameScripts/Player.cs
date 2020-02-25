@@ -4,70 +4,65 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour {
-    private float x = 0;
-    private float y = 0;
+    Vector2 buffer = new Vector2(0, 0); // 入力バッファ
+    Rigidbody2D rb;
+    Dictionary<string, bool> status = new Dictionary<string, bool>();   // Playerから見た方向
+    float rad = 0f;
     public float speed = 1.0f;
-
-    private enum direction {
-        up = 0,
-        down = 1,
-        right = 2,
-        left = 3
-    }
-    direction state;
-    direction buffer;
-
-    private Dictionary<direction, Ray> ray = new Dictionary<direction, Ray>();
-    private RaycastHit hit;
-    private float rad;
-    private float mar = 0.005f;
-
-    private Rigidbody2D rb;
-
+    public float delta = 0.001f;
 
     void Start() {
-        rb = GetComponent<Rigidbody2D>();
-        rad = GetComponent<CircleCollider2D>().radius;
+        rad = gameObject.GetComponent<CircleCollider2D>().radius;
+        rb = gameObject.GetComponent<Rigidbody2D>();
+        status.Add(Vector2.up.ToString(), false);
+        status.Add(Vector2.right.ToString(), false);
+        status.Add(Vector2.down.ToString(), false);
+        status.Add(Vector2.left.ToString(), false);
+        status.Add(Vector2.zero.ToString(), false);
     }
 
     void Update() {
-        InputProcessing();
+        InputBuffer();
         CheckStatus();
         Move();
-
-    }
-
-    void InputProcessing() {
-        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) {
-            buffer = direction.up;
-        } else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) {
-            buffer = direction.down;
-        } else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) {
-            buffer = direction.right;
-        } else if(Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) {
-            buffer = direction.left;
-        }
     }
 
     void CheckStatus() {
-        ray[direction.up] = new Ray(rb.position, new Vector2(0, rad + mar));
-        ray[direction.down] = new Ray(rb.position, new Vector2(0, -rad - mar));
-        ray[direction.right] = new Ray(rb.position, new Vector2(rad + mar, 0));
-        ray[direction.left] = new Ray(rb.position, new Vector2(-rad - mar, 0));
+        status[Vector2.up.ToString()]    = !Physics2D.Raycast(transform.position + transform.up * rad, transform.up, delta);
+        status[Vector2.right.ToString()] = !Physics2D.Raycast(transform.position - transform.up * rad, transform.right, rad + delta);
+        status[Vector2.down.ToString()]  = !Physics2D.Raycast(transform.position - transform.up * rad, -transform.up, delta);
+        status[Vector2.left.ToString()]  = !Physics2D.Raycast(transform.position - transform.up * rad, -transform.right, rad + delta);
 
-        foreach(direction dir in Enum.GetValues(typeof(direction))) { 
-            if(Physics.Raycast(ray[dir], out hit, 10.0f)) {
+        Debug.DrawRay(transform.position + transform.up * rad, transform.up * rad);
+        Debug.DrawRay(transform.position - transform.up * rad, transform.right * rad, Color.blue);
+        Debug.DrawRay(transform.position - transform.up * rad, -transform.up * rad, Color.red);
+        Debug.DrawRay(transform.position - transform.up * rad, -transform.right * rad, Color.yellow);
+    }
 
-            }
+    void InputBuffer() {
+        float x = Input.GetAxis("Horizontal");
+        float y = Input.GetAxis("Vertical");
+        if (Mathf.Abs(x) >= 0.1f && y == 0) {
+            buffer = new Vector2(x / Mathf.Abs(x), 0);
         }
+        if (Mathf.Abs(y) >= 0.1f && x == 0) {
+            buffer = new Vector2(0, y / Mathf.Abs(y));
+        }
+    }
 
-        Debug.DrawRay(ray[direction.up].origin, new Vector2(0, rad), Color.red);
-        Debug.DrawRay(ray[direction.down].origin, new Vector2(0, -rad), Color.red);
-        Debug.DrawRay(ray[direction.left].origin, new Vector2(-rad, 0), Color.red);
-        Debug.DrawRay(ray[direction.right].origin, new Vector2(rad, 0), Color.red);
+    // 渡したベクトルがVector2.upとなす角を返す
+    float VecAngle(Vector2 vec) {
+        float an = Mathf.Atan2(vec.x, vec.y);
+        return an * (360 / Mathf.PI / 2);
     }
 
     void Move() {
-        rb.velocity = new Vector2(x, y) * speed;
+        // バッファをプレイヤーから見た方向に変換してからstatusに突っ込む(比較する)
+        if (status[((Vector2)(Quaternion.Euler(0, 0, VecAngle(transform.up)) * buffer)).ToString()]) {
+            transform.rotation = Quaternion.Euler(0, 0, -VecAngle(buffer));
+            if (buffer != Vector2.zero) {
+                rb.velocity = transform.up * speed;
+            }
+        }
     }
 }
