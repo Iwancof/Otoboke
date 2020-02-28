@@ -27,6 +27,7 @@ public class Player : MonoBehaviour {
         Move();
     }
 
+
     void CheckStatus() {
         status[Vector2.up.ToString()]    = !Physics2D.Raycast(transform.position + transform.up * rad, transform.up, delta);
         status[Vector2.right.ToString()] = !Physics2D.Raycast(transform.position - transform.up * rad, transform.right, rad + delta);
@@ -63,6 +64,16 @@ public class Player : MonoBehaviour {
             if (buffer != Vector2.zero) {
                 rb.velocity = transform.up * speed;
             }
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision) {
+        Debug.Log("aaa");
+        if (collision.tag == "Right") {
+            // ワープ
+            this.transform.position = new Vector2(-13.4f, 0.5f);
+        } else if (collision.tag == "Left") {
+            this.transform.position = new Vector2(13.4f, 0.5f);
         }
     }
 }
