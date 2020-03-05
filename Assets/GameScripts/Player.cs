@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
+using SafePointer;
 
 public class Player : MonoBehaviour {
     Vector2 buffer = new Vector2(0, 0); // 入力バッファ
@@ -10,7 +12,7 @@ public class Player : MonoBehaviour {
     float rad = 0f;
     public float speed = 1.0f;
     public float delta = 0.001f;
-
+    
     void Start() {
         rad = gameObject.GetComponent<CircleCollider2D>().radius;
         rb = gameObject.GetComponent<Rigidbody2D>();
@@ -19,9 +21,12 @@ public class Player : MonoBehaviour {
         status.Add(Vector2.down.ToString(), false);
         status.Add(Vector2.left.ToString(), false);
         status.Add(Vector2.zero.ToString(), false);
+
+        //new Map(19, 19).OverwriteTile();
     }
 
     void Update() {
+
         InputBuffer();
         CheckStatus();
         Move();

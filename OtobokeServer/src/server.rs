@@ -1,9 +1,12 @@
 use std::net::{self,TcpStream};
 use std::io::{Write,Read};
 
+use super::game;
+
 pub struct GameController {
     clients : Vec<TcpStream>,
     player_limit : usize,
+    
 }
 
 impl GameController {
@@ -33,17 +36,20 @@ impl GameController {
         }
     }
     fn player_join(&mut self,mut stream : net::TcpStream) {
-        match stream.write(format!(r#""counter":{}"#,self.clients.len()).as_bytes()) {
+        let mut json = "{".to_string() + &format!(r#""counter":{}"#,self.clients.len()) + "}|";
+        match stream.write(json.as_bytes()) {
             Ok(_) => {
                 println!("Player joined! Player details : {:?}",stream);
                 self.clients.push(stream);
             }
             Err(_) => {
-                println!("Error occured. It will ignore");
+                println!("Error occured. This stream will ignore");
             }
         }
     }
-    pub fn start_game(&mut self) {
+    pub fn start_game(&mut self,map : game::Map) {
+        self.distribute_map(map);
+
         let mut buff = [0;2048];
         loop { //main game loop 
             for mut client in &self.clients {
@@ -60,6 +66,26 @@ impl GameController {
                 }
             }
         }
+    }
+
+    pub fn distribute_map(&mut self,map : game::Map) {
+        //let mut error_clients : Vec<&TcpStream> = vec![];
+        let mut error_clients_index : Vec<usize> = vec![];
+        let mut count = 0;
+        for mut client in &self.clients {
+            match client.write(format!("{}",map.map_to_string()).as_bytes()) {
+                Ok(_) => {}
+                Err(_) => {
+                    println!("[Error]Could not send map data. The stream will exclude");
+                    error_clients_index.push(count);
+                }
+            }
+            count += 1;
+        }
+        for e in &error_clients_index {
+            self.clients.remove(*e);
+        }
+        println!("Map distributed");
     }
 }
 
