@@ -1,14 +1,21 @@
 use std::fs;
 
+pub struct Player {
+    pub x : f32,
+    pub y : f32,
+    pub z : f32,
+}
+
 pub struct Map {
     pub width : usize,
     pub height :usize,
-    pub map : Vec<Vec<i32>>
+    pub field : Vec<Vec<i32>>,
+    pub players : Vec<Player>,
 }
 
 impl Map {
     pub fn new(w : usize ,h : usize) -> Map {
-        Map{width:w,height:h,map:vec![vec![0;h];w]}
+        Map{width:w,height:h,field:vec![vec![0;h];w],players:vec![]}
     }
 
     pub fn create_by_filename(file_name : String) -> Map {
@@ -39,13 +46,13 @@ impl Map {
             });
         }
 
-        Map{width:wid - 1,height:hei,map:map_tmp}
+        Map{width:wid - 1,height:hei,field:map_tmp,players:vec![]}
     }
     
     pub fn show_map(&self) {
         for y in 0..self.height {
             for x in 0..self.width {
-                print!("{}",self.map[x][y]);
+                print!("{}",self.field[x][y]);
             }
             println!("");
         }
@@ -55,10 +62,32 @@ impl Map {
         let mut ret = String::new();
         for y in 0..self.height {
             for x in 0..self.width {
-                ret += &self.map[x][y].to_string();
+                ret += &self.field[x][y].to_string();
             }
             ret += ",";
         }
         ret + "|"
+    }
+    pub fn coordinate_to_json(&self) -> String {
+        let mut ret = String::new();
+        ret += r#"{"Coordinate":["#;
+        for e in &self.players {
+            ret += &(e.coordinate_to_json() + ",");
+        }
+        ret += "]}";
+        ret
+    }
+}
+
+impl Player {
+    pub fn new(x : f32,y : f32,z : f32) -> Player{
+        Player{x:x,y:y,z:z}
+    }
+    pub fn coordinate_to_json(&self) -> String {
+        let mut ret = String::new();
+        ret += "{";
+        ret += &format!(r#""x":"{}","y":"{}","z":"{}""#,self.x,self.y,self.z);
+        ret += "}";
+        ret
     }
 }

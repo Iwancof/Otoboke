@@ -37,11 +37,13 @@ public class MapController : MonoBehaviour
         }
 
         if (time >= 0.2 && IsMapDeployed) {
-            count++;
-            if(count <= 10 || 20 <= count) 
-                nm.WriteLine(Player.transform.position.ToString());
+            nm.WriteLine(VectorToString(Player.transform.position));
             //nm.WriteLine("");
             time = 0;
         }
+    }
+
+    public static string VectorToString(Vector3 vc) {
+        return $"{vc.x},{vc.y},{vc.z}";
     }
 }
