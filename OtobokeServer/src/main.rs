@@ -11,12 +11,12 @@ fn main() { //For one game
 }
 
 fn open_server(map : game::Map) {
-    let mut g = server::GameController::new();
+    let mut g = server::GameController::new(map);
     println!("Game initialized");
 
     g.wait_for_players();
     //g.initialize_players(); //distribute map and etc...
 
-    g.start_game(map);
+    g.start_game();
 }
 
