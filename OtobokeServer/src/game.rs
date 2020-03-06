@@ -74,7 +74,7 @@ impl Map {
         for e in &self.players {
             ret += &(e.coordinate_to_json() + ",");
         }
-        ret += "]}";
+        ret += "]}|";
         ret
     }
 }

@@ -27,7 +27,7 @@ impl GameController {
     pub fn error(&mut self,i : usize) {
         self.error_counter[i] += 1;
         if self.error_counter[i] >= self.error_limit {
-            panic!("[Error-panic]Client disconnected");
+            //panic!("[Error-panic]Client disconnected");
         }
     }
 
@@ -67,6 +67,7 @@ impl GameController {
     }
     pub fn start_game(&mut self) {
         self.distribute_map();
+        //thread::sleep(Duration::from_secs(3));
 
         let mut cant_get_data_count = vec![0,self.clients.len()];
 
@@ -119,14 +120,18 @@ impl GameController {
                     }
                 }
             };
+            thread::sleep(Duration::from_millis(100));
             //println!("{}",self.map.coordinate_to_json());
-            let received_data = self.map.coordinate_to_json().into_bytes();
-            let bytes = &received_data[0..received_data.len()];
+            let received_data = format!("{}:{}",count,self.map.coordinate_to_json());
+            println!("{}",received_data);
+            //let bytes = &received_data[0..received_data.len()];
             for i in 0..self.clients.len() {
-                buffer_streams.clone().lock().unwrap()[i].wr.write(
-                    bytes
+                self.clients[i].write(
+                    received_data.as_bytes()
                  );
             }
+            count += 1;
+            //println!("{:?}",bytes);
         }
     }
 
