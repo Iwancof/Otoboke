@@ -1,17 +1,19 @@
 use std::net::{self,TcpStream};
-use std::io::{Write,Read};
+use std::io::{Write,Read,BufReader,BufWriter,BufRead};
+use std::sync::{mpsc,Arc,Mutex};
+use std::thread;
+use std::time::Duration;
 
 use super::game;
 
 pub struct GameController {
     clients : Vec<TcpStream>,
     player_limit : usize,
-    
 }
 
 impl GameController {
     pub fn new() -> GameController {
-        GameController{clients:Vec::new(),player_limit:1}
+        GameController{clients:Vec::new(),player_limit:2}
     }
 
     pub fn wait_for_players(&mut self) {
@@ -50,20 +52,49 @@ impl GameController {
     pub fn start_game(&mut self,map : game::Map) {
         self.distribute_map(map);
 
-        let mut buff = [0;2048];
+        //self.test_client();
+        //print_typename(BufReader::new(&self.clients[0]));
+        /*
+        let mut streams = vec![];
+        for stream in &self.clients {
+            let 
+            stream.push
+        }
+        */
+        let mut buffer_streams : Arc<Mutex<Vec<BufStream>>>
+            = Arc::new(Mutex::new(
+            self.clients.iter().map(
+            |c|
+            BufStream{
+                rd : BufReader::new(
+                    c.try_clone().unwrap()),
+                wr :  BufWriter::new(
+                    c.try_clone().unwrap())
+            }
+        ).collect()
+            ));
+
         loop { //main game loop 
-            for mut client in &self.clients {
-                match client.read(&mut buff) {
-                    Ok(size) => {
-                        if size != 0 {                        
-                            client.flush().expect("Error occurred in flushing buffer");
-                            println!("{}",String::from_utf8(buff.to_vec()).unwrap());
-                        }
-                    }
-                    Err(_) => {
-                        //println!("Error occurred");
-                    }
+            //for stream in &mut buffer_streams/* : &'static mut Vec<BufStream> */{
+            for i in 0..self.clients.len() {
+                let cloned = buffer_streams.clone();
+                let (sender,receiver) = mpsc::channel();
+                
+                thread::spawn(move || {
+                    let mut locked = cloned.lock().unwrap();
+
+                    let mut ret = String::new();
+                    locked[i].rd.read_line(&mut ret).unwrap();
+                    sender.send(ret);
+                    //println!("test");
+                });
+
+                match receiver.recv_timeout(Duration::from_millis(300)) {
+                //match receiver.recv() {
+                    Ok(s) => { print!("client{} = {}",i,s); }
+                    Err(_) => { continue; }
                 }
+                
             }
         }
     }
@@ -87,5 +118,26 @@ impl GameController {
         }
         println!("Map distributed");
     }
+}
+
+pub struct BufStream {
+    rd : BufReader<TcpStream>,
+    wr : BufWriter<TcpStream>,
+}
+
+/*
+impl BufStream {
+    pub fn from_stream(stream : TcpStream) -> BufStream {
+        let ret : BufStream;
+        ret.wr = BufWriter::new(stream);
+        ret.rd = BufReader::new(stream);
+
+        ret
+    }
+}
+*/
+
+fn print_typename<T>(_ : T) {
+    println!("type = {}",std::any::type_name::<T>());
 }
 
