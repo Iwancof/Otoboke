@@ -15,6 +15,8 @@ public class MapController : MonoBehaviour
     int PlayerCount;
     Dictionary<int, GameObject> Players;
     bool CanPlayerAdd = false;
+    ClientCoordinateForJson TemporaryCoordinate;
+    bool CanUpdateCoordinate = false;
 
     // Start is called before the first frame update
     void Start()
@@ -38,8 +40,6 @@ public class MapController : MonoBehaviour
 
     float time = 0f;
 
-    string tmp;
-
     // Update is called once per frame
     void Update()
     {
@@ -48,6 +48,10 @@ public class MapController : MonoBehaviour
         if(CanPlayerAdd) {
             AddPlayer();
             CanPlayerAdd = false;
+        }
+        if(CanUpdateCoordinate) {
+            UpdatePlayerInfo(TemporaryCoordinate);
+            CanUpdateCoordinate = false;
         }
 
         if(!IsMapDeployed && IsMapReceived) {
@@ -60,11 +64,10 @@ public class MapController : MonoBehaviour
                 $"{Player.transform.position.x}," +
                 $"{Player.transform.position.y}," +
                 $"{Player.transform.position.z}");
-            //nm.ProcessMM1.Clear();
-            //nm.ReadBuffer.Clear(); //うーん...意味わかんない！ｗ
             nm.ProcessReservation((string str) => {
-                tmp = (string)str.Clone();
-                ClientCoordinateForJson cc = JsonUtility.FromJson<ClientCoordinateForJson>(str);
+                //Debug.Log(str);
+                TemporaryCoordinate = JsonUtility.FromJson<ClientCoordinateForJson>(str);
+                CanUpdateCoordinate = true;
             },"Reading other client's coordinate");
             //Debug.Log("Count : " + nm.ReadBuffer.Count + "," + nm.ProcessMM1.Count);
             time = 0;
@@ -80,8 +83,16 @@ public class MapController : MonoBehaviour
             if (i == nm.client_id) continue;
             GameObject obj = (GameObject)Resources.Load("Player");
             obj.name = $"client{i}";
-            Players.Add(i, obj);
+            //Players.Add(i, GameObject.Find($"client{i}(Clone)"));
             MonoBehaviour.Instantiate(obj, new Vector3(15, 20, 0), Quaternion.identity);
+        }
+    }
+    public void UpdatePlayerInfo(ClientCoordinateForJson cc) {
+        foreach(var t in cc.Coordinate.Select((e,i) => (e,i))) {
+            if (nm.client_id == t.i) continue;
+            //Players[t.i].transform.position = t.e.ToVector();
+            GameObject.Find($"client{t.i}(Clone)").transform.position = t.e.ToVector();
+            //Debug.Log(t.e.ToString());
         }
     }
 
@@ -95,6 +106,12 @@ public class ClientCoordinateForJson {
     [System.Serializable]
     public class CoordinateForJson {
         public float x, y, z;
+        public Vector3 ToVector() {
+            return new Vector3(x, y, z);
+        }
+        public override string ToString() {
+            return $"{x},{y},{z}";
+        }
     }
     public CoordinateForJson[] Coordinate;
     public override string ToString() {
