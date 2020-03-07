@@ -7,8 +7,10 @@ public class MapController : MonoBehaviour
 {
 
     NetworksManager nm;
-    public SafeEntity<Map> map = new SafeEntity<Map>(null);
-    public SafeEntity<bool> IsMapReceived = new SafeEntity<bool>(false);
+    //public SafeEntity<Map> map = new SafeEntity<Map>(null);
+    //public SafeEntity<bool> IsMapReceived = new SafeEntity<bool>(false);
+    Map map;
+    bool IsMapReceived = false;
     bool IsMapDeployed = false;
     GameObject Player; //To get player coordinate
 
@@ -19,7 +21,13 @@ public class MapController : MonoBehaviour
         nm = new NetworksManager();
         nm.Connect();
 
-        nm.GetMapDataAsync(map.getrf(), IsMapReceived.getrf());
+        nm.ProcessReservation((string str) => {
+            map = Map.CreateByString(str);
+            IsMapReceived = true;
+        },"Map");
+
+        MonoBehaviour.Instantiate((GameObject)Resources.Load("WallBlock"),
+            new Vector3(0, 0, 0), Quaternion.identity);
     }
 
     float time = 0f;
@@ -30,16 +38,23 @@ public class MapController : MonoBehaviour
     {
         time += Time.deltaTime;
 
-        if (!IsMapDeployed && IsMapReceived.value) {
-            //map.value.ShowInConsole();
-            map.value.OverwriteTile();
+        if(!IsMapDeployed && IsMapReceived) {
+            map.OverwriteTile();
             IsMapDeployed = true;
         }
 
         if (time >= 0.2 && IsMapDeployed) {
-            nm.WriteLine(VectorToString(Player.transform.position));
-            //nm.WriteLine("");
+            nm.WriteLine(
+                $"{Player.transform.position.x}," +
+                $"{Player.transform.position.y}," +
+                $"{Player.transform.position.z}");
+            nm.ProcessReservation((string str) => {
+
+            },"Reading other client's coordinate");
             time = 0;
+        }
+
+        if (IsMapDeployed) {
         }
     }
 
@@ -47,3 +62,4 @@ public class MapController : MonoBehaviour
         return $"{vc.x},{vc.y},{vc.z}";
     }
 }
+

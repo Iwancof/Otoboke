@@ -92,8 +92,6 @@ public class Map {
     }
 
     public static Map CreateByString(string map_data) {
-        //Debug.Log(map_data);
-
         var row = new List<string>(map_data.Split(','));
         int hei = row.Count;
         int wei = row[0].Length;

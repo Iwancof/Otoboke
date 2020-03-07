@@ -21,7 +21,8 @@ pub struct GameController {
 
 impl GameController {
     pub fn new(map : Map) -> GameController {
-        GameController{clients:Vec::new(),player_limit:1,map:map,error_counter:vec![0;1],error_limit:100}
+        let l = 2;
+        GameController{clients:Vec::new(),player_limit:l,map:map,error_counter:vec![0;l],error_limit:100}
     }
     
     pub fn error(&mut self,i : usize) {
@@ -92,11 +93,12 @@ impl GameController {
                     sender.send(ret);
                 });
 
-                match receiver.recv_timeout(Duration::from_millis(300)) {
+                match receiver.recv_timeout(Duration::from_millis(1000)) {
                     Ok(s) => {
                         if s.len() == 0 { //Disconnected or bat connection
                             self.error(i);
                         }
+                        //println!("client[{}] = {}",i,s);
                         let sp = s.split(',');
                         let ret : Vec<f32> = sp.map(|e| match(e.parse()) {
                             Ok(o) => o,
@@ -141,7 +143,9 @@ impl GameController {
         let mut count = 0;
         for mut client in &self.clients {
             match client.write(format!("{}",self.map.map_to_string()).as_bytes()) {
-                Ok(_) => {}
+                Ok(size) => {
+                    println!("Write to {:?}, size = {}",&client,size);
+                }
                 Err(_) => {
                     println!("[Error]Could not send map data. The stream will exclude");
                     error_clients_index.push(count);

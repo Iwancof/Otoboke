@@ -8,6 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System;
 using SafePointer;
+//using System.Date;
+
+public delegate void ProcessManager(string data);
 
 public class NetworksManager {
     public string ip;
@@ -16,75 +19,103 @@ public class NetworksManager {
 
     public TcpClient client;
     public Stream stream;
-    StreamReader reader;
+    public StreamReader reader;
     public StreamWriter writer;
     public bool IsNetworkClientInitialized { get; private set; } = false;
 
-    IEnumerator<string> ReadBuffer;
+    public Queue<string> ReadBuffer;
+    public Queue<ProcessManager> ProcessMM1;
 
     public NetworksManager(string ip, int port) {
         this.ip = ip;
         this.port = port;
+        ReadBuffer = new Queue<string>();
+        ProcessMM1 = new Queue<ProcessManager>();
     }
+
     public NetworksManager() : this("localhost", 8080) {
         Debug.Log("[Warning]Selected dafalt server(localhost:8080).");
     }
-    class tmp { public int counter; };
+    class CounterClass { public int counter; };
     public void Connect() {
-        try {
-            client = new TcpClient(ip, port);
-        } catch (SocketException e) {
-            Debug.Log($"[Error]Could not bind server. server : {ip}:{port}");
-            throw e;
+        (new Action(async () => {
+            await Task.Run(() => {
+                try {
+                    client = new TcpClient(ip, port);
+                } catch (SocketException) {
+                    Debug.LogError($"[Error] Socket client to {ip}:{port} is timeout.");
+                    return;
+                } catch (AggregateException) {
+                    Debug.LogError($"[Error] Could not connect client to {ip}:{port}.");
+                    return;
+                } catch (Exception e) {
+                    Debug.LogError($"[Error] Unknown error occured. {e.Message}");
+                    return;
+                }
+
+                IsNetworkClientInitialized = true;
+
+                stream = client.GetStream();
+                reader = new StreamReader(stream, Encoding.UTF8);
+                writer = new StreamWriter(stream, Encoding.UTF8);
+
+                StartReadingNetwork('|');
+                StartProcessDequeue();
+
+                ProcessReservation((string str) => {
+                    client_id = JsonUtility.FromJson<CounterClass>(str).counter;
+                    Debug.Log("id = " + client_id);
+                }, "Json");
+
+                return;
+            });
+        }))();
+        System.Threading.Thread.Sleep(1000);
+        if (!IsNetworkClientInitialized) {
+            Debug.LogError("[Error] Connection timeout");
+            throw new SocketException(10060);
         }
-        IsNetworkClientInitialized = true;
-        stream = client.GetStream();
-        reader = new StreamReader(stream);
-        writer = new StreamWriter(stream,Encoding.UTF8);
-
-        ReadBuffer = ReadUntil(reader, '|');
-
-        client_id = JsonUtility.FromJson<tmp>(ReadBuffer.Next()).counter;
     }
 
     public void WriteLine(string str) {
-        //writer.WriteLine(str);
-        byte[] bytes = Encoding.UTF8.GetBytes(str + '\n');
+        str += '\n';
+        byte[] bytes = System.Text.Encoding.UTF8.GetBytes(str);
         stream.Write(bytes, 0, bytes.Length);
     }
-    
-    public async void GetMapDataAsync(SafePointer<Map> map_ptr,SafePointer<bool> ptr) {
-        InitCheck();
-        string result = await Task.Run<string>(new Func<string>(ReadBuffer.Next));
-        map_ptr.indir(Map.CreateByString(result));
-        ptr.indir(true);
-    }
 
-    public static IEnumerator<string> ReadUntil(StreamReader sr, char delim) {
-        StringBuilder sb = new StringBuilder();
-
-        while (!sr.EndOfStream) {
-            char c = (char)sr.Read();
-
-            if (c == delim) {
-                yield return sb.ToString();
-                sb = new StringBuilder();
-                continue;
+    public async void StartProcessDequeue() {
+        await Task.Run(() => {
+            while (true) {
+                while (ReadBuffer.Count < 1 || ProcessMM1.Count < 1) ;
+                ProcessMM1.Dequeue()(ReadBuffer.Dequeue());
             }
-
-            sb.Append(c);
-        }
-
-        //return sb.ToString();
+        });
     }
+
+    public void ProcessReservation(ProcessManager pm,string name) {
+        Debug.Log($"Process name ({name}) joined to MM1 queue");
+        ProcessMM1.Enqueue(pm);
+    }
+
+    public async void StartReadingNetwork(char delim) {
+        InitCheck();
+        await Task.Run(() => {
+            StringBuilder sb = new StringBuilder();
+            char c;
+            while (true) {
+                c = (char)reader.Read();
+                if(c == delim) {
+                    ReadBuffer.Enqueue(sb.ToString());
+                    sb.Clear();
+                    continue;
+                }
+                sb.Append(c);
+            }
+        });
+    }
+
+
     private void InitCheck() {
         if (!IsNetworkClientInitialized) throw new Exception("NotworkManager has not be initialized yet");
-    }
-}
-
-static class StringBufferItarator {
-    public static string Next(this IEnumerator<string> enumerator) {
-        enumerator.MoveNext();
-        return enumerator.Current;
     }
 }
