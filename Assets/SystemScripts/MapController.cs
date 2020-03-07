@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using SafePointer;
+using System.Linq;
 
 public class MapController : MonoBehaviour
 {
@@ -32,6 +33,8 @@ public class MapController : MonoBehaviour
 
     float time = 0f;
 
+    string tmp;
+
     int count = 0;
     // Update is called once per frame
     void Update()
@@ -48,9 +51,13 @@ public class MapController : MonoBehaviour
                 $"{Player.transform.position.x}," +
                 $"{Player.transform.position.y}," +
                 $"{Player.transform.position.z}");
+            //nm.ProcessMM1.Clear();
+            //nm.ReadBuffer.Clear(); //うーん...意味わかんない！ｗ
             nm.ProcessReservation((string str) => {
-
+                tmp = (string)str.Clone();
+                ClientCoordinateForJson cc = JsonUtility.FromJson<ClientCoordinateForJson>(str);
             },"Reading other client's coordinate");
+            //Debug.Log("Count : " + nm.ReadBuffer.Count + "," + nm.ProcessMM1.Count);
             time = 0;
         }
 
@@ -60,6 +67,22 @@ public class MapController : MonoBehaviour
 
     public static string VectorToString(Vector3 vc) {
         return $"{vc.x},{vc.y},{vc.z}";
+    }
+}
+
+[System.Serializable]
+public class ClientCoordinateForJson {
+    [System.Serializable]
+    public class CoordinateForJson {
+        public float x, y, z;
+    }
+    public CoordinateForJson[] Coordinate;
+    public override string ToString() {
+        string ret = "";
+        foreach(var t in Coordinate.Select((e,i) => (e,i))) {
+            ret += $"{t.i}:({t.e.x},{t.e.y},{t.e.z}),";
+        }
+        return ret.TrimEnd(',');
     }
 }
 

@@ -71,9 +71,10 @@ impl Map {
     pub fn coordinate_to_json(&self) -> String {
         let mut ret = String::new();
         ret += r#"{"Coordinate":["#;
-        for e in &self.players {
-            ret += &(e.coordinate_to_json() + ",");
+        for i in 0..self.players.len() - 1 {
+            ret += &(self.players[i].coordinate_to_json() + ",");
         }
+        ret += &(self.players[self.players.len() - 1].coordinate_to_json());
         ret += "]}|";
         ret
     }

@@ -124,7 +124,7 @@ impl GameController {
             };
             thread::sleep(Duration::from_millis(100));
             //println!("{}",self.map.coordinate_to_json());
-            let received_data = format!("{}:{}",count,self.map.coordinate_to_json());
+            let received_data = format!("{}",self.map.coordinate_to_json());
             println!("{}",received_data);
             //let bytes = &received_data[0..received_data.len()];
             for i in 0..self.clients.len() {

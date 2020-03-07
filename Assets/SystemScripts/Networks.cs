@@ -86,14 +86,21 @@ public class NetworksManager {
     public async void StartProcessDequeue() {
         await Task.Run(() => {
             while (true) {
-                while (ReadBuffer.Count < 1 || ProcessMM1.Count < 1) ;
-                ProcessMM1.Dequeue()(ReadBuffer.Dequeue());
+                try {
+                    while (ReadBuffer.Count < 1 || ProcessMM1.Count < 1) {
+                        //Debug.Log($"{ReadBuffer.Count},{ProcessMM1.Count}");
+                    }
+                    //Debug.Log("Dequeue : " + ReadBuffer.Peek());
+                    ProcessMM1.Dequeue()(ReadBuffer.Dequeue());
+                } catch(Exception e) {
+                    Debug.LogError($"[Error] {e.Message}");
+                }
             }
         });
     }
 
     public void ProcessReservation(ProcessManager pm,string name) {
-        Debug.Log($"Process name ({name}) joined to MM1 queue");
+        //Debug.Log($"Process name ({name}) joined to MM1 queue");
         ProcessMM1.Enqueue(pm);
     }
 
@@ -106,6 +113,7 @@ public class NetworksManager {
                 c = (char)reader.Read();
                 if(c == delim) {
                     ReadBuffer.Enqueue(sb.ToString());
+
                     sb.Clear();
                     continue;
                 }
