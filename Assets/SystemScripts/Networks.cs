@@ -36,7 +36,8 @@ public class NetworksManager {
     public NetworksManager() : this("localhost", 8080) {
         Debug.Log("[Warning]Selected dafalt server(localhost:8080).");
     }
-    class CounterClass { public int counter; };
+    [System.Serializable]
+    class ForIDCounterClass { public int counter; };
     public void Connect() {
         (new Action(async () => {
             await Task.Run(() => {
@@ -63,7 +64,7 @@ public class NetworksManager {
                 StartProcessDequeue();
 
                 ProcessReservation((string str) => {
-                    client_id = JsonUtility.FromJson<CounterClass>(str).counter;
+                    client_id = JsonUtility.FromJson<ForIDCounterClass>(str).counter;
                     Debug.Log("id = " + client_id);
                 }, "Json");
 

@@ -21,7 +21,7 @@ pub struct GameController {
 
 impl GameController {
     pub fn new(map : Map) -> GameController {
-        let l = 2;
+        let l = 1;
         GameController{clients:Vec::new(),player_limit:l,map:map,error_counter:vec![0;l],error_limit:100}
     }
     
@@ -151,6 +151,17 @@ impl GameController {
                     error_clients_index.push(count);
                 }
             }
+            let count_value = r#"{"value":""#.to_string() + &self.clients.len().to_string() + r#""}|"#;
+            match client.write(count_value.as_bytes()) {
+                Ok(size) => {
+                    println!("Write to {:?}, size = {}",&client,size);
+                }
+                Err(_) => {
+                    println!("[Error]Could not send map data. The stream will exclude");
+                    error_clients_index.push(count);
+                }
+            }
+            
             count += 1;
         }
         for e in &error_clients_index {
