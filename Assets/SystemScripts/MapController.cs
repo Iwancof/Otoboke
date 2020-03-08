@@ -68,9 +68,16 @@ public class MapController : MonoBehaviour
                 $"{Player.transform.position.x}," +
                 $"{Player.transform.position.y}," +
                 $"{Player.transform.position.z}");
+            /*
+            Debug.Log(
+                "Now position = " + 
+                $"{Player.transform.position.x}," +
+                $"{Player.transform.position.y}," +
+                $"{Player.transform.position.z}");
+            */
             nm.ProcessReservation((string str) => {
-                tmp = str;
-                //Debug.Log(str);
+                tmp = str + '\n' + nm.ReadBuffer.Count + " : " + nm.ProcessMM1.Count;
+                //Debug.Log(tmp);
                 TemporaryCoordinate = JsonUtility.FromJson<ClientCoordinateForJson>(str);
                 CanUpdateCoordinate = true;
             },"Reading other client's coordinate");

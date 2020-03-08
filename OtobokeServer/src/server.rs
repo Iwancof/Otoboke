@@ -98,7 +98,9 @@ impl GameController {
                         if s.len() == 0 { //Disconnected or bat connection
                             self.error(i);
                         }
-                        //println!("client[{}] = {}",i,s);
+                        if i == 0 {
+                           //print!("client[{}] = {}",i,s);
+                        }
                         let sp = s.split(',');
                         let ret : Vec<f32> = sp.map(|e| match(e.parse()) {
                             Ok(o) => o,
@@ -125,7 +127,7 @@ impl GameController {
             thread::sleep(Duration::from_millis(100));
             //println!("{}",self.map.coordinate_to_json());
             let received_data = format!("{}",self.map.coordinate_to_json());
-            println!("{}",received_data);
+            //println!("{}",received_data);
             //let bytes = &received_data[0..received_data.len()];
             for i in 0..self.clients.len() {
                 self.clients[i].write(
