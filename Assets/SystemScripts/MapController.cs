@@ -9,7 +9,7 @@ public class MapController : MonoBehaviour
 {
 
     NetworksManager nm;
-    Map map;
+    public Map map;
     bool IsMapReceived = false;
     bool IsMapDeployed = false;
     GameObject Player; //To get player coordinate

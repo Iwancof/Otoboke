@@ -10,6 +10,7 @@ public class Map {
 
     public int Height { get; private set; }
     public int Width { get; private set; }
+    public Dictionary<GameObject,Vector3> TeleportPoint = new Dictionary<GameObject, Vector3>();
 
     public Map(int height,int width) {
         Height = height;
@@ -80,15 +81,37 @@ public class Map {
 
     public void OverwriteTile() {
         var wall_object = (GameObject)Resources.Load("WallBlock");
+        float size = 1.05f;
+        Vector3 Point1 = new Vector3(0, 0, 0), Point2 = new Vector3(0, 0, 0);
         for(int x = 0;x < Width;x++) {
             for (int y = 0; y < Height; y++) {
                 switch (MapData[x][Height - y - 1]) {
                     case MapChip.Wall:
-                        MonoBehaviour.Instantiate(wall_object, new Vector3(x * 1.05f, y * 1.05f, 0), Quaternion.identity);
+                        MonoBehaviour.Instantiate(wall_object, new Vector3(x * size, y * size, 0), Quaternion.identity);
+                        break;
+                    case MapChip.TeleportPoint1:
+                        Point1 = new Vector3(x * size, y * size, 0);
+                        var Teleport1 = (GameObject)Resources.Load("Teleport");
+                        Teleport1.name = "Teleport_1";
+                        MonoBehaviour.Instantiate(Teleport1, Point1, Quaternion.identity);
+                        break;
+                    case MapChip.TeleportPoint2:
+                        Point2 = new Vector3(x * size, y * size, 0);
+                        var Teleport2 = (GameObject)Resources.Load("Teleport");
+                        Teleport2.name = "Teleport_2";
+                        MonoBehaviour.Instantiate(Teleport2, Point2, Quaternion.identity);
                         break;
                 }
             }
         }
+        TeleportPoint.Add(
+            GameObject.Find("Teleport_1(Clone)"),
+            Point2 + new Vector3(-size, 0, 0)
+            );
+        TeleportPoint.Add(
+            GameObject.Find("Teleport_2(Clone)"),
+            Point1 + new Vector3(size, 0, 0)
+            );
     }
 
     public static Map CreateByString(string map_data) {
@@ -119,6 +142,8 @@ public enum MapChip {
     None = 0,
     Wall = 1,
     Respown = 2,
+    TeleportPoint1 = 3,
+    TeleportPoint2 = 4,
     //etc...
 }
 

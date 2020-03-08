@@ -73,12 +73,20 @@ public class Player : MonoBehaviour {
     }
 
     private void OnTriggerEnter2D(Collider2D collision) {
-        Debug.Log("aaa");
+        Debug.Log("Collision!!!!");
+        if(collision.tag == "Teleport") {
+            this.transform.position =
+                GameObject.Find("MapController")
+                .GetComponent<MapController>()
+                .map.TeleportPoint[collision.gameObject];
+        }
+        /*
         if (collision.tag == "Right") {
             // ワープ
             this.transform.position = new Vector2(-13.4f, 0.5f);
         } else if (collision.tag == "Left") {
             this.transform.position = new Vector2(13.4f, 0.5f);
         }
+        */
     }
 }
