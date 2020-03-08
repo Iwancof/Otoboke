@@ -88,9 +88,7 @@ public class NetworksManager {
         await Task.Run(() => {
             while (true) {
                 try {
-                    while (ReadBuffer.Count < 1 || ProcessMM1.Count < 1) {
-                        //Debug.Log($"{ReadBuffer.Count},{ProcessMM1.Count}");
-                    }
+                    while (ReadBuffer.Count < 1 || ProcessMM1.Count < 1) ;
                     //Debug.Log("Dequeue : " + ReadBuffer.Peek());
                     ProcessMM1.Dequeue()(ReadBuffer.Dequeue());
                 } catch(Exception e) {
