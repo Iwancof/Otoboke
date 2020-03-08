@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using SafePointer;
 using System.Linq;
+using UnityEngine.UI;
 
 public class MapController : MonoBehaviour
 {
@@ -17,6 +18,7 @@ public class MapController : MonoBehaviour
     bool CanPlayerAdd = false;
     ClientCoordinateForJson TemporaryCoordinate;
     bool CanUpdateCoordinate = false;
+    Text textobj;
 
     // Start is called before the first frame update
     void Start()
@@ -36,9 +38,11 @@ public class MapController : MonoBehaviour
             CanPlayerAdd = true;
         },"CountPlayer");
 
+        textobj = GameObject.Find("LogText").GetComponent<Text>();
     }
 
     float time = 0f;
+    string tmp = "";
 
     // Update is called once per frame
     void Update()
@@ -65,6 +69,7 @@ public class MapController : MonoBehaviour
                 $"{Player.transform.position.y}," +
                 $"{Player.transform.position.z}");
             nm.ProcessReservation((string str) => {
+                tmp = str;
                 //Debug.Log(str);
                 TemporaryCoordinate = JsonUtility.FromJson<ClientCoordinateForJson>(str);
                 CanUpdateCoordinate = true;
@@ -74,6 +79,7 @@ public class MapController : MonoBehaviour
         }
 
         if (IsMapDeployed) {
+            textobj.text = tmp;
         }
     }
 
@@ -83,15 +89,18 @@ public class MapController : MonoBehaviour
             if (i == nm.client_id) continue;
             GameObject obj = (GameObject)Resources.Load("Player");
             obj.name = $"client{i}";
-            //Players.Add(i, GameObject.Find($"client{i}(Clone)"));
             MonoBehaviour.Instantiate(obj, new Vector3(15, 20, 0), Quaternion.identity);
+            Players.Add(i, GameObject.Find($"client{i}(Clone)"));
         }
     }
     public void UpdatePlayerInfo(ClientCoordinateForJson cc) {
         foreach(var t in cc.Coordinate.Select((e,i) => (e,i))) {
             if (nm.client_id == t.i) continue;
-            //Players[t.i].transform.position = t.e.ToVector();
-            GameObject.Find($"client{t.i}(Clone)").transform.position = t.e.ToVector();
+            Players[t.i].transform.position = t.e.ToVector();
+
+            //Debug.Log(Players[t.i].transform.position.ToString());
+
+            //GameObject.Find($"client{t.i}(Clone)").transform.position = t.e.ToVector();
             //Debug.Log(t.e.ToString());
         }
     }
