@@ -21,7 +21,7 @@ pub struct GameController {
 
 impl GameController {
     pub fn new(map : Map) -> GameController {
-        let l = 1;
+        let l = 2;
         GameController{clients:Vec::new(),player_limit:l,map:map,error_counter:vec![0;l],error_limit:100}
     }
     
@@ -68,7 +68,6 @@ impl GameController {
     }
     pub fn start_game(&mut self) {
         self.distribute_map();
-        //thread::sleep(Duration::from_secs(3));
 
         let mut cant_get_data_count = vec![0,self.clients.len()];
 
@@ -98,9 +97,7 @@ impl GameController {
                         if s.len() == 0 { //Disconnected or bat connection
                             self.error(i);
                         }
-                        if i == 0 {
-                           //print!("client[{}] = {}",i,s);
-                        }
+                        print!("\x1b[15;{}Hclient[{}]={}",i * 30 + 10,i,s);
                         let sp = s.split(',');
                         let ret : Vec<f32> = sp.map(|e| match(e.parse()) {
                             Ok(o) => o,
@@ -124,7 +121,7 @@ impl GameController {
                     }
                 }
             };
-            thread::sleep(Duration::from_millis(100));
+            //thread::sleep(Duration::from_millis(100));
             //println!("{}",self.map.coordinate_to_json());
             let received_data = format!("{}",self.map.coordinate_to_json());
             //println!("{}",received_data);

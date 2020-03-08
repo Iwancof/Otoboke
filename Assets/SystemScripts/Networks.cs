@@ -24,13 +24,13 @@ public class NetworksManager {
     public bool IsNetworkClientInitialized { get; private set; } = false;
 
     public Queue<string> ReadBuffer;
-    public Queue<ProcessManager> ProcessMM1;
+    public Queue<KeyValuePair<string,ProcessManager>> ProcessMM1;
 
     public NetworksManager(string ip, int port) {
         this.ip = ip;
         this.port = port;
         ReadBuffer = new Queue<string>();
-        ProcessMM1 = new Queue<ProcessManager>();
+        ProcessMM1 = new Queue<KeyValuePair<string, ProcessManager>>();
     }
 
     public NetworksManager() : this("localhost", 8080) {
@@ -59,6 +59,7 @@ public class NetworksManager {
                 stream = client.GetStream();
                 reader = new StreamReader(stream, Encoding.UTF8);
                 writer = new StreamWriter(stream, Encoding.UTF8);
+                stream.WriteTimeout = 100;
 
                 StartReadingNetwork('|');
                 StartProcessDequeue();
@@ -81,6 +82,7 @@ public class NetworksManager {
     public void WriteLine(string str) {
         str += '\n';
         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(str);
+        Debug.Log("Send : " + str);
         stream.Write(bytes, 0, bytes.Length);
     }
 
@@ -88,9 +90,12 @@ public class NetworksManager {
         await Task.Run(() => {
             while (true) {
                 try {
-                    while (ReadBuffer.Count < 1 || ProcessMM1.Count < 1) ;
+                    while (ReadBuffer.Count < 1 || ProcessMM1.Count < 1) {
+                        if (ProcessMM1.Count >= 10) Debug.LogError("Process reservation limit reached. name : " + ProcessMM1.Dequeue().Key);
+                        if (ReadBuffer.Count >= 10) Debug.LogError("ReadBuffer limit reached. data : " + ReadBuffer.Dequeue());
+                    }
                     //Debug.Log("Dequeue : " + ReadBuffer.Peek());
-                    ProcessMM1.Dequeue()(ReadBuffer.Dequeue());
+                    ProcessMM1.Dequeue().Value(ReadBuffer.Dequeue());
                 } catch(Exception e) {
                     Debug.LogError($"[Error] {e.Message}");
                 }
@@ -100,7 +105,7 @@ public class NetworksManager {
 
     public void ProcessReservation(ProcessManager pm,string name) {
         //Debug.Log($"Process name ({name}) joined to MM1 queue");
-        ProcessMM1.Enqueue(pm);
+        ProcessMM1.Enqueue(new KeyValuePair<string, ProcessManager>(name, pm));
     }
 
     public async void StartReadingNetwork(char delim) {
