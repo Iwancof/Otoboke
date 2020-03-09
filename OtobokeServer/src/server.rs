@@ -116,6 +116,7 @@ impl GameController {
                         //println!("{:?}",ret);
                     }
                     Err(_) => { 
+                        panic!("[Error] Client disconnected");
                         self.error(i);
                         continue; 
                     }
