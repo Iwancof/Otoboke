@@ -83,35 +83,40 @@ public class Map {
         var wall_object = (GameObject)Resources.Load("WallBlock");
         float size = 1.05f;
         Vector3 Point1 = new Vector3(0, 0, 0), Point2 = new Vector3(0, 0, 0);
-        for(int x = 0;x < Width;x++) {
+        GameObject TeleportObj1 = null, TeleportObj2 = null;
+        for (int x = 0;x < Width;x++) {
             for (int y = 0; y < Height; y++) {
                 switch (MapData[x][Height - y - 1]) {
                     case MapChip.Wall:
-                        MonoBehaviour.Instantiate(wall_object, new Vector3(x * size, y * size, 0), Quaternion.identity);
+                        var obj = MonoBehaviour.Instantiate(wall_object, new Vector3(x * size, y * size, 0), Quaternion.identity);
+                        obj.name = $"WallBlock_[{x},{y}]";
                         break;
                     case MapChip.TeleportPoint1:
                         Point1 = new Vector3(x * size, y * size, 0);
-                        var Teleport1 = (GameObject)Resources.Load("Teleport");
-                        Teleport1.name = "Teleport_1";
-                        MonoBehaviour.Instantiate(Teleport1, Point1, Quaternion.identity);
+                        TeleportObj1 = MonoBehaviour.Instantiate((GameObject)Resources.Load("Teleport"), Point1, Quaternion.identity);
+                        TeleportObj1.name = "Teleport_1";
                         break;
                     case MapChip.TeleportPoint2:
                         Point2 = new Vector3(x * size, y * size, 0);
-                        var Teleport2 = (GameObject)Resources.Load("Teleport");
-                        Teleport2.name = "Teleport_2";
-                        MonoBehaviour.Instantiate(Teleport2, Point2, Quaternion.identity);
+                        TeleportObj2 = MonoBehaviour.Instantiate((GameObject)Resources.Load("Teleport"), Point2, Quaternion.identity);
+                        TeleportObj2.name = "Teleport_2";
                         break;
                 }
             }
         }
+        
+        //if (TeleportObj1 != null && TeleportObj2 != null) {
         TeleportPoint.Add(
-            GameObject.Find("Teleport_1(Clone)"),
+            GameObject.Find("Teleport_1"),
+            //TeleportObj1,
             Point2 + new Vector3(-size, 0, 0)
             );
         TeleportPoint.Add(
-            GameObject.Find("Teleport_2(Clone)"),
+            GameObject.Find("Teleport_2"),
+            //TeleportObj2,
             Point1 + new Vector3(size, 0, 0)
             );
+        //}
     }
 
     public static Map CreateByString(string map_data) {

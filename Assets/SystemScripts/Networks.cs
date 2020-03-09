@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using System;
 using SafePointer;
 //using System.Date;
@@ -43,6 +44,7 @@ public class NetworksManager {
             await Task.Run(() => {
                 try {
                     client = new TcpClient(ip, port);
+                    client.ReceiveTimeout = 2 * 60 * 1000;
                 } catch (SocketException) {
                     Debug.LogError($"[Error] Socket client to {ip}:{port} is timeout.");
                     return;
@@ -59,15 +61,15 @@ public class NetworksManager {
                 stream = client.GetStream();
                 reader = new StreamReader(stream, Encoding.UTF8);
                 writer = new StreamWriter(stream, Encoding.UTF8);
-                stream.WriteTimeout = 100;
 
-                StartReadingNetwork('|');
-                StartProcessDequeue();
+                StartReadingNetwork('|',MapController.TokenSource.Token);
+                StartProcessDequeue(MapController.TokenSource.Token);
 
                 ProcessReservation((string str) => {
                     client_id = JsonUtility.FromJson<ForIDCounterClass>(str).counter;
                     Debug.Log("id = " + client_id);
                 }, "Json");
+
 
                 return;
             });
@@ -82,21 +84,24 @@ public class NetworksManager {
     public void WriteLine(string str) {
         str += '\n';
         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(str);
-        Debug.Log("Send : " + str);
         stream.Write(bytes, 0, bytes.Length);
     }
 
-    public async void StartProcessDequeue() {
+    public async void StartProcessDequeue(CancellationToken token) {
         await Task.Run(() => {
             while (true) {
                 try {
                     while (ReadBuffer.Count < 1 || ProcessMM1.Count < 1) {
                         if (ProcessMM1.Count >= 10) Debug.LogError("Process reservation limit reached. name : " + ProcessMM1.Dequeue().Key);
                         if (ReadBuffer.Count >= 10) Debug.LogError("ReadBuffer limit reached. data : " + ReadBuffer.Dequeue());
+                        if (token.IsCancellationRequested) {
+                            Debug.Log("Cancel in StartProcessDequeue");
+                            return;
+                        }
                     }
                     //Debug.Log("Dequeue : " + ReadBuffer.Peek());
                     ProcessMM1.Dequeue().Value(ReadBuffer.Dequeue());
-                } catch(Exception e) {
+                } catch (Exception e) {
                     Debug.LogError($"[Error] {e.Message}");
                 }
             }
@@ -108,14 +113,19 @@ public class NetworksManager {
         ProcessMM1.Enqueue(new KeyValuePair<string, ProcessManager>(name, pm));
     }
 
-    public async void StartReadingNetwork(char delim) {
+    public async void StartReadingNetwork(char delim,CancellationToken token) {
         InitCheck();
         await Task.Run(() => {
             StringBuilder sb = new StringBuilder();
             char c;
             while (true) {
                 c = (char)reader.Read();
-                if(c == delim) {
+                if (token.IsCancellationRequested) {
+                    Debug.Log("Cancel in StartReadingNetwork");
+                    return;
+                }
+
+                if (c == delim) {
                     ReadBuffer.Enqueue(sb.ToString());
 
                     sb.Clear();

@@ -4,6 +4,9 @@ using UnityEngine;
 using SafePointer;
 using System.Linq;
 using UnityEngine.UI;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 public class MapController : MonoBehaviour
 {
@@ -19,10 +22,13 @@ public class MapController : MonoBehaviour
     ClientCoordinateForJson TemporaryCoordinate;
     bool CanUpdateCoordinate = false;
     Text textobj;
+    public static CancellationTokenSource TokenSource;
 
     // Start is called before the first frame update
     void Start()
     {
+        TokenSource = new CancellationTokenSource();
+
         Player = GameObject.Find("Player");
         nm = new NetworksManager();
         nm.Connect();
@@ -94,10 +100,16 @@ public class MapController : MonoBehaviour
         Players = new Dictionary<int, GameObject>();
         for (int i = 0; i < PlayerCount; i++) {
             if (i == nm.client_id) continue;
-            GameObject obj = (GameObject)Resources.Load("Player");
+            var obj = MonoBehaviour.Instantiate((GameObject)Resources.Load("Player"), new Vector3(15, 20, 0), Quaternion.identity);
             obj.name = $"client{i}";
-            MonoBehaviour.Instantiate(obj, new Vector3(15, 20, 0), Quaternion.identity);
-            Players.Add(i, GameObject.Find($"client{i}(Clone)"));
+            /*
+            obj.GetComponent<SpriteRenderer>().material.color = new Color(
+                Random.Range(0, 256),
+                Random.Range(0, 256),
+                Random.Range(0, 256)
+                );
+                */
+            Players.Add(i, GameObject.Find($"client{i}"));
         }
     }
     public void UpdatePlayerInfo(ClientCoordinateForJson cc) {
@@ -114,6 +126,10 @@ public class MapController : MonoBehaviour
 
     public static string VectorToString(Vector3 vc) {
         return $"{vc.x},{vc.y},{vc.z}";
+    }
+
+    private void OnApplicationQuit() {
+        TokenSource.Cancel();
     }
 }
 
