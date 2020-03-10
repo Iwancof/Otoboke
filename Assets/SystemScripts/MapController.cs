@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 public class MapController : MonoBehaviour
 {
 
-    NetworksManager nm;
+    public static NetworksManager nm;
     public Map map;
     bool isMapReceived = false;
     bool isMapDeployed = false;
@@ -22,17 +22,13 @@ public class MapController : MonoBehaviour
     ClientCoordinateForJson TemporaryCoordinate;
     bool canUpdateCoordinate = false;
     Text textobj;
-    public static CancellationTokenSource tokenSource;
-
+    public static CancellationTokenSource tokenSource = new CancellationTokenSource();
+    private Color[] Colors = { Color.red, Color.green, Color.blue };
     
     // Start is called before the first frame update
     void Start()
     {
-        tokenSource = new CancellationTokenSource();
-
         player = GameObject.Find("Player");
-        nm = new NetworksManager();
-        nm.Connect();
 
         nm.ProcessReservation((string str) => {
             map = Map.CreateByString(str);
@@ -98,7 +94,7 @@ public class MapController : MonoBehaviour
 
         if (test_player_defeat.reached) { 
             Debug.Log("Defeat");
-            GameObject.Find("Player").GetComponent<Player>().Defeat();
+            //GameObject.Find("Player").GetComponent<Player>().Defeat();
         }
     }
 
@@ -108,13 +104,7 @@ public class MapController : MonoBehaviour
             if (i == nm.client_id) continue;
             var obj = MonoBehaviour.Instantiate((GameObject)Resources.Load("Player"), new Vector3(15, 20, 0), Quaternion.identity);
             obj.name = $"client{i}";
-            /*
-            obj.GetComponent<SpriteRenderer>().material.color = new Color(
-                Random.Range(0, 256),
-                Random.Range(0, 256),
-                Random.Range(0, 256)
-                );
-                */
+            obj.GetComponent<SpriteRenderer>().material.color = Colors[i];
             players.Add(i, GameObject.Find($"client{i}"));
         }
     }
@@ -128,6 +118,7 @@ public class MapController : MonoBehaviour
             //GameObject.Find($"client{t.i}(Clone)").transform.position = t.e.ToVector();
             //Debug.Log(t.e.ToString());
         }
+        Debug.Log("Packman:" + cc.Packman.ToString());
     }
 
     public static string VectorToString(Vector3 vc) {
@@ -179,6 +170,7 @@ public class ClientCoordinateForJson {
         }
     }
     public CoordinateForJson[] Coordinate;
+    public CoordinateForJson Packman;
     public override string ToString() {
         string ret = "";
         foreach(var t in Coordinate.Select((e,i) => (e,i))) {

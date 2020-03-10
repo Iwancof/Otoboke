@@ -39,46 +39,48 @@ public class NetworksManager {
     }
     [System.Serializable]
     class ForIDCounterClass { public int counter; };
-    public void Connect() {
-        (new Action(async () => {
-            await Task.Run(() => {
-                try {
-                    client = new TcpClient(ip, port);
-                    client.ReceiveTimeout = 2 * 60 * 1000;
-                } catch (SocketException) {
-                    Debug.LogError($"[Error] Socket client to {ip}:{port} is timeout.");
+    public async void Connect() {
+        await Task.Run(() => {
+            (new Action(async () => {
+                await Task.Run(() => {
+                    try {
+                        client = new TcpClient(ip, port);
+                        client.ReceiveTimeout = 2 * 60 * 1000;
+                    } catch (SocketException) {
+                        Debug.LogError($"[Error] Socket client to {ip}:{port} is timeout.");
+                        return;
+                    } catch (AggregateException) {
+                        Debug.LogError($"[Error] Could not connect client to {ip}:{port}.");
+                        return;
+                    } catch (Exception e) {
+                        Debug.LogError($"[Error] Unknown error occured. {e.Message}");
+                        return;
+                    }
+
+                    IsNetworkClientInitialized = true;
+
+                    stream = client.GetStream();
+                    reader = new StreamReader(stream, Encoding.UTF8);
+                    writer = new StreamWriter(stream, Encoding.UTF8);
+
+                    StartReadingNetwork('|', MapController.tokenSource.Token);
+                    StartProcessDequeue(MapController.tokenSource.Token);
+
+                    ProcessReservation((string str) => {
+                        client_id = JsonUtility.FromJson<ForIDCounterClass>(str).counter;
+                        Debug.Log("id = " + client_id);
+                    }, "Json");
+
+
                     return;
-                } catch (AggregateException) {
-                    Debug.LogError($"[Error] Could not connect client to {ip}:{port}.");
-                    return;
-                } catch (Exception e) {
-                    Debug.LogError($"[Error] Unknown error occured. {e.Message}");
-                    return;
-                }
-
-                IsNetworkClientInitialized = true;
-
-                stream = client.GetStream();
-                reader = new StreamReader(stream, Encoding.UTF8);
-                writer = new StreamWriter(stream, Encoding.UTF8);
-
-                StartReadingNetwork('|',MapController.tokenSource.Token);
-                StartProcessDequeue(MapController.tokenSource.Token);
-
-                ProcessReservation((string str) => {
-                    client_id = JsonUtility.FromJson<ForIDCounterClass>(str).counter;
-                    Debug.Log("id = " + client_id);
-                }, "Json");
-
-
-                return;
-            });
-        }))();
-        System.Threading.Thread.Sleep(1000);
-        if (!IsNetworkClientInitialized) {
-            Debug.LogError("[Error] Connection timeout");
-            throw new SocketException(10060);
-        }
+                });
+            }))();
+            System.Threading.Thread.Sleep(1000);
+            if (!IsNetworkClientInitialized) {
+                Debug.LogError("[Error] Connection timeout");
+                throw new SocketException(10060);
+            }
+        });
     }
 
     public void WriteLine(string str) {

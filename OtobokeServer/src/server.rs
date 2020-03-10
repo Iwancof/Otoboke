@@ -21,7 +21,7 @@ pub struct GameController {
 
 impl GameController {
     pub fn new(map : Map) -> GameController {
-        let l = 1;
+        let l = 2;
         GameController{clients:Vec::new(),player_limit:l,map:map,error_counter:vec![0;l],error_limit:100}
     }
     
@@ -97,7 +97,7 @@ impl GameController {
                         if s.len() == 0 { //Disconnected or bat connection
                             self.error(i);
                         }
-                        print!("\x1b[10;{}Hclient[{}]={}",i * 40 + 10,i,s);
+                        print!("\x1b[1;{}Hclient[{}]={}",i * 40 + 10,i,s);
                         let sp = s.split(',');
                         let ret : Vec<f32> = sp.map(|e| match(e.parse()) {
                             Ok(o) => o,
@@ -116,7 +116,6 @@ impl GameController {
                         //println!("{:?}",ret);
                     }
                     Err(_) => { 
-                        panic!("[Error] Client disconnected");
                         self.error(i);
                         continue; 
                     }
