@@ -76,10 +76,7 @@ public class Player : MonoBehaviour {
     private void OnTriggerEnter2D(Collider2D collision) {
         Debug.Log("Collision!!!!");
         if(collision.tag == "Teleport") {
-            this.transform.position =
-                GameObject.Find("MapController")
-                .GetComponent<MapController>()
-                .map.TeleportPoint[collision.gameObject];
+            this.transform.position = MapController.map.TeleportPoint[collision.gameObject];
         }
         /*
         if (collision.tag == "Right") {
