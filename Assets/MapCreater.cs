@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Linq;
+using System;
 
 public class Map {
     public MapChip[][] MapData;
@@ -84,12 +85,19 @@ public class Map {
         float size = 1.05f;
         Vector3 Point1 = new Vector3(0, 0, 0), Point2 = new Vector3(0, 0, 0);
         GameObject TeleportObj1 = null, TeleportObj2 = null;
+        bool isRespownPointSet = false;
+
         for (int x = 0;x < Width;x++) {
             for (int y = 0; y < Height; y++) {
                 switch (MapData[x][Height - y - 1]) {
                     case MapChip.Wall:
                         var obj = MonoBehaviour.Instantiate(wall_object, new Vector3(x * size, y * size, 0), Quaternion.identity);
                         obj.name = $"WallBlock_[{x},{y}]";
+                        break;
+                    case MapChip.Respown:
+                        if (isRespownPointSet) throw MapCreateException.RespownPointDuplication;
+                        Player.respownPoint = new Vector3(x * size, y * size, 0);
+                        isRespownPointSet = true;
                         break;
                     case MapChip.TeleportPoint1:
                         Point1 = new Vector3(x * size, y * size, 0);
@@ -157,4 +165,12 @@ public static class MapCreater
     public static Map CreateTestMap() {
         return new Map(10, 10);
     }
+}
+
+public class MapCreateException : Exception {
+    public MapCreateException(string str) : base(str) {
+
+    }
+    public static MapCreateException RespownPointDuplication = 
+        new MapCreateException("Respown point must not be more than two.");
 }

@@ -12,7 +12,8 @@ public class Player : MonoBehaviour {
     float rad = 0f;
     public float speed = 1.0f;
     public float delta = 0.001f;
-    
+    public static Vector3 respownPoint;
+
     void Start() {
         rad = gameObject.GetComponent<CircleCollider2D>().radius;
         rb = gameObject.GetComponent<Rigidbody2D>();
@@ -88,5 +89,18 @@ public class Player : MonoBehaviour {
             this.transform.position = new Vector2(13.4f, 0.5f);
         }
         */
+    }
+
+    public async void Defeat() { //やられた時の処理
+        this.buffer = new Vector2(0, 0);
+
+        this.gameObject.SetActive(false);
+
+        await System.Threading.Tasks.Task.Run(() => {
+            System.Threading.Thread.Sleep(2000); //復活までの時間
+        });
+
+        this.transform.position = respownPoint;
+        this.gameObject.SetActive(true);
     }
 }

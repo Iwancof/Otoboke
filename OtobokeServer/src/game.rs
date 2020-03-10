@@ -11,11 +11,12 @@ pub struct Map {
     pub height :usize,
     pub field : Vec<Vec<i32>>,
     pub players : Vec<Player>,
+    pub packman : Player,
 }
 
 impl Map {
     pub fn new(w : usize ,h : usize) -> Map {
-        Map{width:w,height:h,field:vec![vec![0;h];w],players:vec![]}
+        Map{width:w,height:h,field:vec![vec![0;h];w],players:vec![],packman:Player::new(3.,3.,3.)}
     }
 
     pub fn create_by_filename(file_name : String) -> Map {
@@ -46,7 +47,7 @@ impl Map {
             });
         }
 
-        Map{width:wid - 1,height:hei,field:map_tmp,players:vec![]}
+        Map{width:wid - 1,height:hei,field:map_tmp,players:vec![],packman:Player::new(3.,3.,3.)}
     }
     
     pub fn show_map(&self) {
@@ -75,7 +76,9 @@ impl Map {
             ret += &(self.players[i].coordinate_to_json() + ",");
         }
         ret += &(self.players[self.players.len() - 1].coordinate_to_json());
-        ret += "]}|";
+        ret += r#"],"Packman":"#;
+        ret += &self.packman.coordinate_to_json();
+        ret += "}|";
         ret
     }
 }

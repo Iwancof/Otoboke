@@ -14,18 +14,18 @@ using SafePointer;
 public delegate void ProcessManager(string data);
 
 public class NetworksManager {
-    public string ip;
-    public int port;
-    public int client_id;
+    string ip;
+    int port;
+    public int client_id { get; private set; }
 
-    public TcpClient client;
-    public Stream stream;
-    public StreamReader reader;
-    public StreamWriter writer;
+    TcpClient client;
+    Stream stream;
+    StreamReader reader;
+    StreamWriter writer;
     public bool IsNetworkClientInitialized { get; private set; } = false;
 
-    public Queue<string> ReadBuffer;
-    public Queue<KeyValuePair<string,ProcessManager>> ProcessMM1;
+    public Queue<string> ReadBuffer { get; private set; }
+    public Queue<KeyValuePair<string, ProcessManager>> ProcessMM1 { get; private set; }
 
     public NetworksManager(string ip, int port) {
         this.ip = ip;
@@ -39,55 +39,59 @@ public class NetworksManager {
     }
     [System.Serializable]
     class ForIDCounterClass { public int counter; };
-    public void Connect() {
-        (new Action(async () => {
-            await Task.Run(() => {
-                try {
-                    client = new TcpClient(ip, port);
-                    client.ReceiveTimeout = 2 * 60 * 1000;
-                } catch (SocketException) {
-                    Debug.LogError($"[Error] Socket client to {ip}:{port} is timeout.");
+    public async void Connect() {
+        await Task.Run(() => {
+            (new Action(async () => {
+                await Task.Run(() => {
+                    try {
+                        client = new TcpClient(ip, port);
+                        client.ReceiveTimeout = 2 * 60 * 1000;
+                    } catch (SocketException) {
+                        Debug.LogError($"[Error] Socket client to {ip}:{port} is timeout.");
+                        return;
+                    } catch (AggregateException) {
+                        Debug.LogError($"[Error] Could not connect client to {ip}:{port}.");
+                        return;
+                    } catch (Exception e) {
+                        Debug.LogError($"[Error] Unknown error occured. {e.Message}");
+                        return;
+                    }
+
+                    IsNetworkClientInitialized = true;
+
+                    stream = client.GetStream();
+                    reader = new StreamReader(stream, Encoding.UTF8);
+                    writer = new StreamWriter(stream, Encoding.UTF8);
+
+                    StartReadingNetwork('|', MapController.tokenSource.Token);
+                    StartProcessDequeue(MapController.tokenSource.Token);
+
+                    ProcessReservation((string str) => {
+                        client_id = JsonUtility.FromJson<ForIDCounterClass>(str).counter;
+                        Debug.Log("id = " + client_id);
+                    }, "Json");
+
+
                     return;
-                } catch (AggregateException) {
-                    Debug.LogError($"[Error] Could not connect client to {ip}:{port}.");
-                    return;
-                } catch (Exception e) {
-                    Debug.LogError($"[Error] Unknown error occured. {e.Message}");
-                    return;
-                }
-
-                IsNetworkClientInitialized = true;
-
-                stream = client.GetStream();
-                reader = new StreamReader(stream, Encoding.UTF8);
-                writer = new StreamWriter(stream, Encoding.UTF8);
-
-                StartReadingNetwork('|',MapController.TokenSource.Token);
-                StartProcessDequeue(MapController.TokenSource.Token);
-
-                ProcessReservation((string str) => {
-                    client_id = JsonUtility.FromJson<ForIDCounterClass>(str).counter;
-                    Debug.Log("id = " + client_id);
-                }, "Json");
-
-
-                return;
-            });
-        }))();
-        System.Threading.Thread.Sleep(1000);
-        if (!IsNetworkClientInitialized) {
-            Debug.LogError("[Error] Connection timeout");
-            throw new SocketException(10060);
-        }
+                });
+            }))();
+            System.Threading.Thread.Sleep(1000);
+            if (!IsNetworkClientInitialized) {
+                Debug.LogError("[Error] Connection timeout");
+                throw new SocketException(10060);
+            }
+        });
     }
 
     public void WriteLine(string str) {
+        InitCheck();
         str += '\n';
         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(str);
         stream.Write(bytes, 0, bytes.Length);
     }
 
-    public async void StartProcessDequeue(CancellationToken token) {
+    private async void StartProcessDequeue(CancellationToken token) {
+        InitCheck();
         await Task.Run(() => {
             while (true) {
                 try {
@@ -101,6 +105,9 @@ public class NetworksManager {
                     }
                     //Debug.Log("Dequeue : " + ReadBuffer.Peek());
                     ProcessMM1.Dequeue().Value(ReadBuffer.Dequeue());
+                }catch(MapCreateException e) {
+                    Debug.LogError($"Map data corruption. {e.Message}");
+                    return;
                 } catch (Exception e) {
                     Debug.LogError($"[Error] {e.Message}");
                 }
@@ -109,11 +116,12 @@ public class NetworksManager {
     }
 
     public void ProcessReservation(ProcessManager pm,string name) {
+        InitCheck();
         //Debug.Log($"Process name ({name}) joined to MM1 queue");
         ProcessMM1.Enqueue(new KeyValuePair<string, ProcessManager>(name, pm));
     }
 
-    public async void StartReadingNetwork(char delim,CancellationToken token) {
+    private async void StartReadingNetwork(char delim,CancellationToken token) {
         InitCheck();
         await Task.Run(() => {
             StringBuilder sb = new StringBuilder();

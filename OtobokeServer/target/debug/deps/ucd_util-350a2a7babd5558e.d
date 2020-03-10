@@ -1,0 +1,11 @@
+C:\Users\wakuto\Documents\Otoboke\OtobokeServer\target\debug\deps\libucd_util-350a2a7babd5558e.rlib: C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\lib.rs C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\hangul.rs C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\ideograph.rs C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\name.rs C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\property.rs C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\unicode_tables\mod.rs C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\unicode_tables\jamo_short_name.rs
+
+C:\Users\wakuto\Documents\Otoboke\OtobokeServer\target\debug\deps\ucd_util-350a2a7babd5558e.d: C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\lib.rs C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\hangul.rs C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\ideograph.rs C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\name.rs C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\property.rs C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\unicode_tables\mod.rs C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\unicode_tables\jamo_short_name.rs
+
+C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\lib.rs:
+C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\hangul.rs:
+C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\ideograph.rs:
+C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\name.rs:
+C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\property.rs:
+C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\unicode_tables\mod.rs:
+C:\Users\wakuto\.cargo\registry\src\github.com-1ecc6299db9ec823\ucd-util-0.1.7\src\unicode_tables\jamo_short_name.rs:
