@@ -1,1 +1,1 @@
-C:\Users\Rock0x3FA\Otoboke\OtobokeServer\target\debug\otoboke_server.exe: C:\Users\Rock0x3FA\Otoboke\OtobokeServer\src\game.rs C:\Users\Rock0x3FA\Otoboke\OtobokeServer\src\main.rs C:\Users\Rock0x3FA\Otoboke\OtobokeServer\src\server.rs
+C:\Users\wakuto\Documents\Otoboke\OtobokeServer\target\debug\otoboke_server.pdb: C:\Users\wakuto\Documents\Otoboke\OtobokeServer\src\game.rs C:\Users\wakuto\Documents\Otoboke\OtobokeServer\src\main.rs C:\Users\wakuto\Documents\Otoboke\OtobokeServer\src\server.rs

@@ -186,6 +186,6 @@ impl BufStream {
 }
 
 fn print_typename<T>(_ : T) {
-    println!("type = {}",std::any::type_name::<T>());
+    //println!("type = {}",std::any::type_name::<T>());
 }
 
