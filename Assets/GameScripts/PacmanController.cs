@@ -45,7 +45,7 @@ public class PacmanController: MonoBehaviour
             anim.SetBool("move", true);
         }
         prevPos = transform.position;
-        Move(transform.position);
+        //Move(transform.position, time);
     }
 
     void CheckStatus() {
@@ -61,10 +61,11 @@ public class PacmanController: MonoBehaviour
     }
 
     // posの座標までtime秒間かけて移動
-    void Move(Vector3 pos) {
+    public void Move(Vector3 pos, float time) {
         if(firsttime) {
             startTime = Time.timeSinceLevelLoad;
             firstPos = transform.position;
+            this.time = time;
             distance = pos - transform.position;
             firsttime = false;
         }

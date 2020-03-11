@@ -16,6 +16,7 @@ public class MapController : MonoBehaviour
     bool isMapReceived = false;
     bool isMapDeployed = false;
     GameObject player; //To get player coordinate
+    PacmanController pacmanController;
     int playerCount;
     Dictionary<int, GameObject> players;
     bool canPlayerAdd = false;
@@ -29,6 +30,7 @@ public class MapController : MonoBehaviour
     void Start()
     {
         player = GameObject.Find("Player");
+        pacmanController = GameObject.Find("Pacman").GetComponent<PacmanController>();
 
         nm.ProcessReservation((string str) => {
             map = Map.CreateByString(str);
@@ -118,7 +120,9 @@ public class MapController : MonoBehaviour
             //GameObject.Find($"client{t.i}(Clone)").transform.position = t.e.ToVector();
             //Debug.Log(t.e.ToString());
         }
-        Debug.Log("Packman:" + cc.Packman.ToString());
+        var time = 0.2f; // 目的の座標まで移動するのに掛ける時間
+        pacmanController.Move(cc.Pacman.ToVector(), time);
+        Debug.Log("Pacman:" + cc.Pacman.ToString());
     }
 
     public static string VectorToString(Vector3 vc) {
@@ -170,7 +174,7 @@ public class ClientCoordinateForJson {
         }
     }
     public CoordinateForJson[] Coordinate;
-    public CoordinateForJson Packman;
+    public CoordinateForJson Pacman;
     public override string ToString() {
         string ret = "";
         foreach(var t in Coordinate.Select((e,i) => (e,i))) {
