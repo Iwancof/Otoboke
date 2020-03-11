@@ -85,8 +85,23 @@ public class PacmanController: MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision) {
         Debug.Log("Collision!!!!");
+        /*
         if(collision.tag == "Teleport") {
             this.transform.position = MapController.map.TeleportPoint[collision.gameObject];
+        }*/
+        switch(collision.tag) {
+            case "Teleport":
+                this.transform.position = MapController.map.TeleportPoint[collision.gameObject];
+                break;
+            case "Bait":
+                PointManager.baites++;
+                Destroy(collision.gameObject);
+                break;
+            case "PowerBait":
+                PointManager.startTime = Time.timeSinceLevelLoad;
+                PointManager.hasPower = true;
+                Destroy(collision.gameObject);
+                break;
         }
     }
 }

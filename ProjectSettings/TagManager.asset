@@ -7,6 +7,8 @@ TagManager:
   - Right
   - Left
   - Teleport
+  - Bait
+  - PowerBait
   layers:
   - Default
   - TransparentFX

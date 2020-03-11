@@ -82,17 +82,22 @@ public class Map {
 
     public void OverwriteTile() {
         var wall_object = (GameObject)Resources.Load("WallBlock");
+        var bait_object = (GameObject)Resources.Load("Bait");
+        var powerBait_object = (GameObject)Resources.Load("PowerBait");
         float size = 1.05f;
         Vector3 Point1 = new Vector3(0, 0, 0), Point2 = new Vector3(0, 0, 0);
         GameObject TeleportObj1 = null, TeleportObj2 = null;
+        GameObject map = new GameObject("Map");
         bool isRespownPointSet = false;
 
         for (int x = 0;x < Width;x++) {
             for (int y = 0; y < Height; y++) {
+                var pos = new Vector3(x * size, y * size, 0);
                 switch (MapData[x][Height - y - 1]) {
                     case MapChip.Wall:
                         var obj = MonoBehaviour.Instantiate(wall_object, new Vector3(x * size, y * size, 0), Quaternion.identity);
                         obj.name = $"WallBlock_[{x},{y}]";
+                        obj.transform.parent = map.transform;
                         break;
                     case MapChip.Respown:
                         if (isRespownPointSet) throw MapCreateException.RespownPointDuplication;
@@ -103,11 +108,23 @@ public class Map {
                         Point1 = new Vector3(x * size, y * size, 0);
                         TeleportObj1 = MonoBehaviour.Instantiate((GameObject)Resources.Load("Teleport"), Point1, Quaternion.identity);
                         TeleportObj1.name = "Teleport_1";
+                        TeleportObj1.transform.parent = map.transform;
                         break;
                     case MapChip.TeleportPoint2:
                         Point2 = new Vector3(x * size, y * size, 0);
                         TeleportObj2 = MonoBehaviour.Instantiate((GameObject)Resources.Load("Teleport"), Point2, Quaternion.identity);
                         TeleportObj2.name = "Teleport_2";
+                        TeleportObj2.transform.parent = map.transform;
+                        break;
+                    case MapChip.Bait:
+                        obj = MonoBehaviour.Instantiate(bait_object, pos, Quaternion.identity);
+                        obj.name = $"Bait_[{x},{y}]";
+                        obj.transform.parent = map.transform;
+                        break;
+                    case MapChip.PowerBait:
+                        obj = MonoBehaviour.Instantiate(powerBait_object, pos, Quaternion.identity);
+                        obj.name = $"PowerBait_[{x},{y}]";
+                        obj.transform.parent = map.transform;
                         break;
                 }
             }
@@ -157,6 +174,8 @@ public enum MapChip {
     Respown = 2,
     TeleportPoint1 = 3,
     TeleportPoint2 = 4,
+    Bait = 5,
+    PowerBait = 6,
     //etc...
 }
 

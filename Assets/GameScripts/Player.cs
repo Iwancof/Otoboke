@@ -78,14 +78,6 @@ public class Player : MonoBehaviour {
         if(collision.tag == "Teleport") {
             this.transform.position = MapController.map.TeleportPoint[collision.gameObject];
         }
-        /*
-        if (collision.tag == "Right") {
-            // ワープ
-            this.transform.position = new Vector2(-13.4f, 0.5f);
-        } else if (collision.tag == "Left") {
-            this.transform.position = new Vector2(13.4f, 0.5f);
-        }
-        */
     }
 
     public async void Defeat() { //やられた時の処理
