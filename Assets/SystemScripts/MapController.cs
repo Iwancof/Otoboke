@@ -121,7 +121,8 @@ public class MapController : MonoBehaviour
             //Debug.Log(t.e.ToString());
         }
         var time = 0.2f; // 目的の座標まで移動するのに掛ける時間
-        pacmanController.Move(cc.Pacman.ToVector(), time);
+        pacmanController.targetPos = cc.Pacman.ToVector();
+        pacmanController.time = time;
         Debug.Log("Pacman:" + cc.Pacman.ToString());
     }
 

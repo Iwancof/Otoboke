@@ -8,9 +8,10 @@ public class PacmanController: MonoBehaviour
     Vector3 firstPos;
     Vector3 prevPos;
     Vector3 distance;
+    public Vector3 targetPos;
 
     float startTime;
-    float time = 10f;
+    public float time = 10f;
     float diff;
 
     bool firsttime = true;
@@ -45,7 +46,7 @@ public class PacmanController: MonoBehaviour
             anim.SetBool("move", true);
         }
         prevPos = transform.position;
-        //Move(transform.position, time);
+        Move(targetPos, time);
     }
 
     void CheckStatus() {
@@ -61,7 +62,7 @@ public class PacmanController: MonoBehaviour
     }
 
     // posの座標までtime秒間かけて移動
-    public void Move(Vector3 pos, float time) {
+    void Move(Vector3 pos, float time) {
         if(firsttime) {
             startTime = Time.timeSinceLevelLoad;
             firstPos = transform.position;
@@ -76,6 +77,7 @@ public class PacmanController: MonoBehaviour
         diff = Time.timeSinceLevelLoad - startTime;
         var rate = diff / time;
         if(rate >= 1) {
+            firsttime = true;
             return;
         }
 
