@@ -10,7 +10,7 @@ public class Title : MonoBehaviour {
     public Vector3 initialArrowCoordinate;
     public float arrowMoveSize = 17;
     private bool isConnectingServer = false;
-
+    public static bool canStartGame = false;
 
     // Start is called before the first frame update
     void Start() {
@@ -23,11 +23,16 @@ public class Title : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        if(isConnectingServer) {
+        if(canStartGame) {
+            UnityEngine.SceneManagement.SceneManager.LoadScene("SampleScene");
+            return;
+        }
+
+        if (isConnectingServer) {
             time += Time.deltaTime;
             if(time <= 1f) return;
             if (MapController.nm.IsNetworkClientInitialized) {//ネットワークの初期化が完了
-                UnityEngine.SceneManagement.SceneManager.LoadScene("SampleScene");
+                statusObject.text = "Wait other players...";
                 isConnectingServer = false;
                 return;
             }
