@@ -71,6 +71,9 @@ public class NetworksManager {
                         Debug.Log("id = " + client_id);
                     }, "Json");
 
+                    ProcessReservation((string str) => {
+                        if (str == "StartGame") Title.canStartGame = true;
+                    },"StartGame");
 
                     return;
                 });

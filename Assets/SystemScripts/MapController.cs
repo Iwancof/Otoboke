@@ -25,11 +25,14 @@ public class MapController : MonoBehaviour
     Text textobj;
     public static CancellationTokenSource tokenSource = new CancellationTokenSource();
     private Color[] Colors = { Color.red, Color.green, Color.blue };
-    
+
+    GameObject test_object;
+
     // Start is called before the first frame update
     void Start()
     {
         player = GameObject.Find("Player");
+        test_object = GameObject.Find("test_object");
         pacmanController = GameObject.Find("Pacman").GetComponent<PacmanController>();
 
         nm.ProcessReservation((string str) => {
@@ -48,12 +51,15 @@ public class MapController : MonoBehaviour
 
     LoopTimer communicateCoordinate = new LoopTimer(0.2f);
     LoopTimer test_player_defeat = new LoopTimer(15f);
+    LoopTimer print_player_coordinate = new LoopTimer(0.5f);
+
     string tmp = "";
 
     // Update is called once per frame
     void Update()
     {
         LoopTimer.timeUpdate(Time.deltaTime);
+
 
         if(canPlayerAdd) {
             AddPlayer();
@@ -98,6 +104,18 @@ public class MapController : MonoBehaviour
             Debug.Log("Defeat");
             //GameObject.Find("Player").GetComponent<Player>().Defeat();
         }
+
+        if(print_player_coordinate.reached) {
+            Debug.Log(
+                $"{(int)(player.transform.position.x / 1.05f)}," +
+                $"{(int)(player.transform.position.y / 1.05f)}," +
+                $"{(int)(player.transform.position.z / 1.05f)},");
+            test_object.transform.position = new Vector3(
+                (int)(player.transform.position.x / 1.05f) * 1.05f,
+                (int)(player.transform.position.y / 1.05f) * 1.05f,
+                (int)(player.transform.position.z / 1.05f) * 1.05f
+                );
+        }
     }
 
     public void AddPlayer() {
@@ -123,7 +141,7 @@ public class MapController : MonoBehaviour
         var time = 0.2f; // 目的の座標まで移動するのに掛ける時間
         pacmanController.targetPos = cc.Pacman.ToVector();
         pacmanController.time = time;
-        Debug.Log("Pacman:" + cc.Pacman.ToString());
+        //Debug.Log("Pacman:" + cc.Pacman.ToString());
     }
 
     public static string VectorToString(Vector3 vc) {
