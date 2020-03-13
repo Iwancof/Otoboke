@@ -15,8 +15,8 @@ GameObject:
   - component: {fileID: 8606032090907975545}
   - component: {fileID: 8606032090907975550}
   m_Layer: 0
-  m_Name: pacman
-  m_TagString: Untagged
+  m_Name: Pacman
+  m_TagString: Pacman
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -114,6 +114,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87a23d0054dbd8b499a12bf3c8c7642c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  targetPos: {x: 0, y: 0, z: 0}
+  time: 10
   speed: 1
   delta: 0.001
 --- !u!58 &8606032090907975545

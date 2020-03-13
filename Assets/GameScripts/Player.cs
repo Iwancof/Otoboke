@@ -80,6 +80,12 @@ public class Player : MonoBehaviour {
         }
     }
 
+    private void OnCollisionEnter2D(Collision2D collision) {
+        if(collision.gameObject.tag == "Pacman") {
+            Defeat();
+        }
+    }
+
     public async void Defeat() { //やられた時の処理
         this.buffer = new Vector2(0, 0);
 
