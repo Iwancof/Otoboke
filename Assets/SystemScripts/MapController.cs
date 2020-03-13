@@ -51,7 +51,7 @@ public class MapController : MonoBehaviour
 
     LoopTimer communicateCoordinate = new LoopTimer(0.2f);
     LoopTimer test_player_defeat = new LoopTimer(15f);
-    LoopTimer print_player_coordinate = new LoopTimer(0.5f);
+    LoopTimer print_player_coordinate = new LoopTimer(0.1f);
 
     string tmp = "";
 
@@ -111,9 +111,9 @@ public class MapController : MonoBehaviour
                 $"{(int)(player.transform.position.y / 1.05f)}," +
                 $"{(int)(player.transform.position.z / 1.05f)},");
             test_object.transform.position = new Vector3(
-                (int)(player.transform.position.x / 1.05f) * 1.05f,
-                (int)(player.transform.position.y / 1.05f) * 1.05f,
-                (int)(player.transform.position.z / 1.05f) * 1.05f
+                (int)((player.transform.position.x - 0.5f + 1) / 1.05f) * 1.05f,
+                (int)((player.transform.position.y - 0.5f + 1) / 1.05f) * 1.05f,
+                (int)((player.transform.position.z - 0.5f + 1) / 1.05f) * 1.05f
                 );
         }
     }
