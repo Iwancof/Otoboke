@@ -93,6 +93,10 @@ public class NetworksManager {
         stream.Write(bytes, 0, bytes.Length);
     }
 
+    public void QueueLog() {
+        Debug.Log($"Process:{ProcessMM1.Count},Data:{ReadBuffer.Count}");
+    }
+
     private async void StartProcessDequeue(CancellationToken token) {
         InitCheck();
         await Task.Run(() => {
@@ -120,7 +124,7 @@ public class NetworksManager {
 
     public void ProcessReservation(ProcessManager pm,string name) {
         InitCheck();
-        //Debug.Log($"Process name ({name}) joined to MM1 queue");
+        Debug.Log($"Process name ({name}) joined to MM1 queue");
         ProcessMM1.Enqueue(new KeyValuePair<string, ProcessManager>(name, pm));
     }
 
@@ -137,6 +141,7 @@ public class NetworksManager {
                 }
 
                 if (c == delim) {
+                    Debug.Log(sb.ToString());
                     ReadBuffer.Enqueue(sb.ToString());
 
                     sb.Clear();

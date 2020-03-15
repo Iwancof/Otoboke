@@ -15,13 +15,13 @@ public class MapController : MonoBehaviour
     public static Map map;
     bool isMapReceived = false;
     bool isMapDeployed = false;
+    bool canPlayerAdd = false;
+    bool canUpdateCoordinate = false;
     GameObject player; //To get player coordinate
     PacmanController pacmanController;
     int playerCount;
     Dictionary<int, GameObject> players;
-    bool canPlayerAdd = false;
     ClientCoordinateForJson TemporaryCoordinate;
-    bool canUpdateCoordinate = false;
     Text textobj;
     public static CancellationTokenSource tokenSource = new CancellationTokenSource();
     private Color[] Colors = { Color.red, Color.green, Color.blue };
@@ -52,6 +52,7 @@ public class MapController : MonoBehaviour
     LoopTimer communicateCoordinate = new LoopTimer(0.2f);
     LoopTimer test_player_defeat = new LoopTimer(15f);
     LoopTimer print_player_coordinate = new LoopTimer(0.1f);
+    LoopTimer test_print_queue = new LoopTimer(0.2f);
 
     string tmp = "";
 
@@ -73,7 +74,22 @@ public class MapController : MonoBehaviour
         if(!isMapDeployed && isMapReceived) {
             map.OverwriteTile();
             isMapDeployed = true;
+
+            void tmp_func(string str) {
+                nm.ProcessReservation(tmp_func, "Get coordinate LoopCast()A");
+                tmp = str + '\n' + nm.ReadBuffer.Count + " : " + nm.ProcessMM1.Count;
+                //Debug.Log(tmp);
+                //Debug.Log(str);
+                //Debug.Log(str.TrimTo('{'));
+                TemporaryCoordinate = JsonUtility.FromJson<ClientCoordinateForJson>(str);
+                canUpdateCoordinate = true;
+            }
+            nm.ProcessReservation(tmp_func, "Get coordinate LoopCast()B");
+
         }
+
+        if(test_print_queue.reached)
+            nm.QueueLog();
 
         if (isMapDeployed && communicateCoordinate.reached) {
             nm.WriteLine(
@@ -87,13 +103,17 @@ public class MapController : MonoBehaviour
                 $"{Player.transform.position.y}," +
                 $"{Player.transform.position.z}");
             */
+            /*
             nm.ProcessReservation((string str) => {
                 tmp = str + '\n' + nm.ReadBuffer.Count + " : " + nm.ProcessMM1.Count;
                 //Debug.Log(tmp);
+                //Debug.Log(str);
+                //Debug.Log(str.TrimTo('{'));
                 TemporaryCoordinate = JsonUtility.FromJson<ClientCoordinateForJson>(str);
                 canUpdateCoordinate = true;
             },"Reading other client's coordinate");
             //Debug.Log("Count : " + nm.ReadBuffer.Count + "," + nm.ProcessMM1.Count);
+            */
         }
 
         if (isMapDeployed) {
@@ -138,9 +158,11 @@ public class MapController : MonoBehaviour
             //GameObject.Find($"client{t.i}(Clone)").transform.position = t.e.ToVector();
             //Debug.Log(t.e.ToString());
         }
+        /*
         var time = 0.2f; // 目的の座標まで移動するのに掛ける時間
         pacmanController.targetPos = cc.Pacman.ToVector();
         pacmanController.time = time;
+        */
         //Debug.Log("Pacman:" + cc.Pacman.ToString());
     }
 
@@ -151,6 +173,16 @@ public class MapController : MonoBehaviour
     private void OnApplicationQuit() {
         tokenSource.Cancel();
     }
+
+    private void ReceivedCoordinate(string str) {
+        tmp = str + '\n' + nm.ReadBuffer.Count + " : " + nm.ProcessMM1.Count;
+        //Debug.Log(tmp);
+        //Debug.Log(str);
+        //Debug.Log(str.TrimTo('{'));
+        TemporaryCoordinate = JsonUtility.FromJson<ClientCoordinateForJson>(str);
+        canUpdateCoordinate = true;
+    }
+
 }
 
 public class LoopTimer {
@@ -181,19 +213,19 @@ public class LoopTimer {
 }
 
 [System.Serializable]
-public class ClientCoordinateForJson {
-    [System.Serializable]
-    public class CoordinateForJson {
-        public float x, y, z;
-        public Vector3 ToVector() {
-            return new Vector3(x, y, z);
-        }
-        public override string ToString() {
-            return $"{x},{y},{z}";
-        }
+public class CoordinateForJson {
+    public float x, y, z;
+    public Vector3 ToVector() {
+        return new Vector3(x, y, z);
     }
+    public override string ToString() {
+        return $"{x},{y},{z}";
+    }
+}
+
+[System.Serializable]
+public class ClientCoordinateForJson {
     public CoordinateForJson[] Coordinate;
-    public CoordinateForJson Pacman;
     public override string ToString() {
         string ret = "";
         foreach(var t in Coordinate.Select((e,i) => (e,i))) {
@@ -202,7 +234,22 @@ public class ClientCoordinateForJson {
         return ret.TrimEnd(',');
     }
 }
+
+[System.Serializable]
+public class PacmanCoordinateForJson {
+    public CoordinateForJson Pacman;
+}
+
 [System.Serializable]
 class ForCountPlayerClass {
     public int value;
 };
+
+static class StringExtension {
+    public static (string Tag, string Data) TrimTo(this string x, char d) {
+        int index = x.IndexOf(d);
+        return (Tag: x.Substring(0, index), Data: x.Substring(index + 1, x.Length - index - 1));
+    }
+}
+
+
