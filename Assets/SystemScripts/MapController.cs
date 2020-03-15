@@ -8,29 +8,31 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-public class MapController : MonoBehaviour
-{
+public class MapController : MonoBehaviour {
 
     public static NetworksManager nm;
     public static Map map;
-    bool isMapReceived = false;
-    bool isMapDeployed = false;
-    bool canPlayerAdd = false;
-    bool canUpdateCoordinate = false;
+    bool 
+        isMapReceived = false,
+        isMapDeployed = false,
+        canPlayerAdd = false,
+        canPlayerUpdateCoordinate = false,
+        canPacmanUpdateCoordinate = false;
     GameObject player; //To get player coordinate
     PacmanController pacmanController;
     int playerCount;
     Dictionary<int, GameObject> players;
-    ClientCoordinateForJson TemporaryCoordinate;
+    ClientCoordinateForJson PlayerTemporaryCoordinate;
+    PacmanCoordinateForJson PacmanTemporaryCoordinate;
     Text textobj;
     public static CancellationTokenSource tokenSource = new CancellationTokenSource();
     private Color[] Colors = { Color.red, Color.green, Color.blue };
+    float size = 1.05f; //this will fix
 
     GameObject test_object;
 
     // Start is called before the first frame update
-    void Start()
-    {
+    void Start() {
         player = GameObject.Find("Player");
         test_object = GameObject.Find("test_object");
         pacmanController = GameObject.Find("Pacman").GetComponent<PacmanController>();
@@ -38,13 +40,13 @@ public class MapController : MonoBehaviour
         nm.ProcessReservation((string str) => {
             map = Map.CreateByString(str);
             isMapReceived = true;
-        },"Map");
+        }, "Map");
 
         nm.ProcessReservation((string str) => {
             playerCount = JsonUtility.FromJson<ForCountPlayerClass>(str).value;
             Debug.Log("Count : " + playerCount);
             canPlayerAdd = true;
-        },"CountPlayer");
+        }, "CountPlayer");
 
         textobj = GameObject.Find("LogText").GetComponent<Text>();
     }
@@ -57,38 +59,48 @@ public class MapController : MonoBehaviour
     string tmp = "";
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
         LoopTimer.timeUpdate(Time.deltaTime);
 
-
-        if(canPlayerAdd) {
+        if (canPlayerAdd) {
             AddPlayer();
             canPlayerAdd = false;
         }
-        if(canUpdateCoordinate) {
-            UpdatePlayerInfo(TemporaryCoordinate);
-            canUpdateCoordinate = false;
+        if (canPlayerUpdateCoordinate) {
+            UpdatePlayerInfo(PlayerTemporaryCoordinate);
+            canPlayerUpdateCoordinate = false;
+        }
+        if(canPacmanUpdateCoordinate) {
+            UpdatePacmanInfo(PacmanTemporaryCoordinate);
+            canPacmanUpdateCoordinate = false;
         }
 
-        if(!isMapDeployed && isMapReceived) {
+
+        if (!isMapDeployed && isMapReceived) {
             map.OverwriteTile();
             isMapDeployed = true;
 
             void tmp_func(string str) {
                 nm.ProcessReservation(tmp_func, "Get coordinate LoopCast()A");
                 tmp = str + '\n' + nm.ReadBuffer.Count + " : " + nm.ProcessMM1.Count;
-                //Debug.Log(tmp);
-                //Debug.Log(str);
-                //Debug.Log(str.TrimTo('{'));
-                TemporaryCoordinate = JsonUtility.FromJson<ClientCoordinateForJson>(str);
-                canUpdateCoordinate = true;
+
+                var get_data = str.TrimTo(';');
+                if (get_data.Tag == "PLAYER") {
+                    PlayerTemporaryCoordinate = JsonUtility.FromJson<ClientCoordinateForJson>(get_data.Data);
+                    canPlayerUpdateCoordinate = true;
+                } else if (get_data.Tag == "PACMAN") {
+                    PacmanTemporaryCoordinate = JsonUtility.FromJson<PacmanCoordinateForJson>(get_data.Data);
+                    canPacmanUpdateCoordinate = true;
+                } else {
+                    throw new Exception("Invalid tag");
+                }
+
             }
             nm.ProcessReservation(tmp_func, "Get coordinate LoopCast()B");
 
         }
 
-        if(test_print_queue.reached)
+        if (test_print_queue.reached)
             nm.QueueLog();
 
         if (isMapDeployed && communicateCoordinate.reached) {
@@ -96,45 +108,24 @@ public class MapController : MonoBehaviour
                 $"{player.transform.position.x}," +
                 $"{player.transform.position.y}," +
                 $"{player.transform.position.z}");
-            /*
-            Debug.Log(
-                "Now position = " + 
-                $"{Player.transform.position.x}," +
-                $"{Player.transform.position.y}," +
-                $"{Player.transform.position.z}");
-            */
-            /*
-            nm.ProcessReservation((string str) => {
-                tmp = str + '\n' + nm.ReadBuffer.Count + " : " + nm.ProcessMM1.Count;
-                //Debug.Log(tmp);
-                //Debug.Log(str);
-                //Debug.Log(str.TrimTo('{'));
-                TemporaryCoordinate = JsonUtility.FromJson<ClientCoordinateForJson>(str);
-                canUpdateCoordinate = true;
-            },"Reading other client's coordinate");
-            //Debug.Log("Count : " + nm.ReadBuffer.Count + "," + nm.ProcessMM1.Count);
-            */
         }
 
         if (isMapDeployed) {
             textobj.text = tmp;
         }
 
-        if (test_player_defeat.reached) { 
+        if (test_player_defeat.reached) {
             Debug.Log("Defeat");
-            //GameObject.Find("Player").GetComponent<Player>().Defeat();
         }
 
-        if(print_player_coordinate.reached) {
-            Debug.Log(
-                $"{(int)(player.transform.position.x / 1.05f)}," +
-                $"{(int)(player.transform.position.y / 1.05f)}," +
-                $"{(int)(player.transform.position.z / 1.05f)},");
+        if (print_player_coordinate.reached) {
+            /*
             test_object.transform.position = new Vector3(
-                (int)((player.transform.position.x - 0.5f + 1) / 1.05f) * 1.05f,
-                (int)((player.transform.position.y - 0.5f + 1) / 1.05f) * 1.05f,
-                (int)((player.transform.position.z - 0.5f + 1) / 1.05f) * 1.05f
+                (int)((player.transform.position.x - size / 2 + 1) / size) * size,
+                (int)((player.transform.position.y - size / 2 + 1) / size) * size,
+                (int)((player.transform.position.z - size / 2 + 1) / size) * size
                 );
+            */
         }
     }
 
@@ -149,7 +140,7 @@ public class MapController : MonoBehaviour
         }
     }
     public void UpdatePlayerInfo(ClientCoordinateForJson cc) {
-        foreach(var t in cc.Coordinate.Select((e,i) => (e,i))) {
+        foreach (var t in cc.Coordinate.Select((e, i) => (e, i))) {
             if (nm.client_id == t.i) continue;
             players[t.i].transform.position = t.e.ToVector();
 
@@ -165,6 +156,10 @@ public class MapController : MonoBehaviour
         */
         //Debug.Log("Pacman:" + cc.Pacman.ToString());
     }
+    public void UpdatePacmanInfo(PacmanCoordinateForJson cc) {
+        pacmanController.targetPos = cc.Pacman.ToVector() * size;
+        pacmanController.time = 0.2f;
+    }
 
     public static string VectorToString(Vector3 vc) {
         return $"{vc.x},{vc.y},{vc.z}";
@@ -173,16 +168,6 @@ public class MapController : MonoBehaviour
     private void OnApplicationQuit() {
         tokenSource.Cancel();
     }
-
-    private void ReceivedCoordinate(string str) {
-        tmp = str + '\n' + nm.ReadBuffer.Count + " : " + nm.ProcessMM1.Count;
-        //Debug.Log(tmp);
-        //Debug.Log(str);
-        //Debug.Log(str.TrimTo('{'));
-        TemporaryCoordinate = JsonUtility.FromJson<ClientCoordinateForJson>(str);
-        canUpdateCoordinate = true;
-    }
-
 }
 
 public class LoopTimer {
