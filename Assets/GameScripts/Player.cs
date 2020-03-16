@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using SafePointer;
+using System.Linq;
 
 public class Player : MonoBehaviour {
     Vector2 buffer = new Vector2(0, 0); // 入力バッファ
@@ -13,6 +15,8 @@ public class Player : MonoBehaviour {
     public float speed = 1.0f;
     public float delta = 0.001f;
     public static Vector3 respownPoint;
+    public static int[][] map;
+    int[][] root;
 
     void Start() {
         rad = gameObject.GetComponent<CircleCollider2D>().radius;
@@ -85,6 +89,93 @@ public class Player : MonoBehaviour {
             Defeat();
         }
     }
+
+    public void RootSearch() {
+        root = new int[map.Length][];
+        for(int k = 0; k < map.Length; k++) {
+            root[k] = new int[map[k].Length];
+        }
+        int i = 0, j = 0;
+        foreach(var x in map) {
+            j = 0;
+            foreach(var y in x) {
+                if(y == 2) goto end;
+                j++;
+            }
+            i++;
+        }
+        end:
+
+        // 幅優先探索
+        var list = new (int x, int y)[4];
+        list[0] = (0, 1);
+        list[1] = (1, 0);
+        list[2] = (0, -1);
+        list[3] = (-1, 0);
+
+        var q = new Queue<(int x,int y)>();
+        q.Enqueue((i,j));
+
+        while(q.Count > 0) {
+            var tmp = q.Peek();
+            foreach(var l in list) {
+                var x = tmp.x + l.x;
+                var y = tmp.y + l.y;
+                if (x >= 0 && y >= 0 && x < root.Length && y < root[0].Length && root[x][y] == 0) {
+                    if(!isWall(map[x][y])) {
+                        root[x][y] = root[tmp.x][tmp.y] + 1;
+                        q.Enqueue((x, y));
+                    } else {
+                        root[x][y] = 99;
+                    }
+                }
+            }
+            q.Dequeue();
+        }
+
+        for(int x = 0; x < root.Length; x++) {
+            Array.Reverse(root[x]);
+        }
+        var arr = new int[root[0].Length][];
+        for(int x = 0; x < arr.Length; x++) {
+            arr[x] = new int[root.Length];
+        }
+        for(int x = 0; x < arr.Length; x++) {
+            for(int y = 0; y < arr[0].Length; y++) {
+                arr[x][y] = root[y][x];
+            }
+        }
+        Array.Reverse(arr);
+        root = arr;
+
+        /*
+        var str = "";
+        for(int x = 0; x < root.Length; x++) {
+            for(int y = 0; y < root[0].Length; y++) {
+                if(root[x][y] >= 10) {
+                    str += " " + root[x][y].ToString();
+                } else {
+                    str += "  " + root[x][y].ToString();
+                }
+            }
+            str += '\n';
+        }
+        File.WriteAllText(Application.dataPath + "/mapdata.txt", str);
+        */
+    }
+
+    bool isWall(int m) {
+        if(m == 1 || m == 3 || m == 4) {
+            return true;
+        }
+        return false;
+    }
+
+/*
+    (int x, int y) GetCoordinate(Vector3 position) {
+
+    }
+    */
 
     public async void Defeat() { //やられた時の処理
         this.buffer = new Vector2(0, 0);

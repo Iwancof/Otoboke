@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Linq;
 using System;
+using System.IO;
 
 public class Map {
     public MapChip[][] MapData;
@@ -17,10 +18,13 @@ public class Map {
         Height = height;
         Width = width;
 
+        Player.map = new int[Width][];
         MapData = new MapChip[Width][];
         for(int x = 0;x < Width;x++) {
+            Player.map[x] = new int[Height];
             MapData[x] = new MapChip[Height];
             for(int y = 0;y < Height;y++) {
+                Player.map[x][y] = -1;
                 MapData[x][y] = MapChip.None;
             }
         }
@@ -90,9 +94,12 @@ public class Map {
         GameObject map = new GameObject("Map");
         bool isRespownPointSet = false;
 
+        var str = "";
         for (int x = 0;x < Width;x++) {
             for (int y = 0; y < Height; y++) {
                 var pos = new Vector3(x * size, y * size, 0);
+                Player.map[x][Height - y - 1] = (int)MapData[x][Height - y - 1];
+                str += ((int)MapData[x][Height - y - 1]).ToString();
                 switch (MapData[x][Height - y - 1]) {
                     case MapChip.Wall:
                         var obj = MonoBehaviour.Instantiate(wall_object, new Vector3(x * size, y * size, 0), Quaternion.identity);
@@ -128,8 +135,12 @@ public class Map {
                         break;
                 }
             }
+            str += '\n';
         }
+        //File.WriteAllText(Application.dataPath + "/mapdata.txt", str);
         
+        GameObject.FindWithTag("Player").GetComponent<Player>().RootSearch();
+
         //if (TeleportObj1 != null && TeleportObj2 != null) {
         TeleportPoint.Add(
             GameObject.Find("Teleport_1"),
