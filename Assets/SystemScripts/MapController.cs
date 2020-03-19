@@ -12,7 +12,7 @@ public class MapController : MonoBehaviour {
 
     public static NetworksManager nm;
     public static Map map;
-    bool 
+        bool 
         isMapReceived = false,
         isMapDeployed = false,
         canPlayerAdd = false,
@@ -124,6 +124,13 @@ public class MapController : MonoBehaviour {
                 (int)((player.transform.position.x - size / 2 + 1) / size) * size,
                 (int)((player.transform.position.y - size / 2 + 1) / size) * size,
                 (int)((player.transform.position.z - size / 2 + 1) / size) * size
+                );
+            */
+            /*
+            Debug.Log($"" +
+                $"{(int)((player.transform.position.x - size / 2 + 1) / size)}," +
+                $"{(int)((player.transform.position.y - size / 2 + 1) / size)}," +
+                $"{(int)((player.transform.position.z - size / 2 + 1) / size)}"
                 );
             */
         }
