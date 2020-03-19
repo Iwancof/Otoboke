@@ -18,13 +18,10 @@ public class Map {
         Height = height;
         Width = width;
 
-        Player.map = new int[Width][];
         MapData = new MapChip[Width][];
         for(int x = 0;x < Width;x++) {
-            Player.map[x] = new int[Height];
             MapData[x] = new MapChip[Height];
             for(int y = 0;y < Height;y++) {
-                Player.map[x][y] = -1;
                 MapData[x][y] = MapChip.None;
             }
         }
@@ -98,7 +95,6 @@ public class Map {
         for (int x = 0;x < Width;x++) {
             for (int y = 0; y < Height; y++) {
                 var pos = new Vector3(x * size, y * size, 0);
-                Player.map[x][Height - y - 1] = (int)MapData[x][Height - y - 1];
                 str += ((int)MapData[x][Height - y - 1]).ToString();
                 switch (MapData[x][Height - y - 1]) {
                     case MapChip.Wall:
