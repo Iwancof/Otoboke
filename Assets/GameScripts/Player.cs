@@ -37,12 +37,10 @@ public class Player : MonoBehaviour {
     }
 
     void Update() {
-
-        InputBuffer();
-        CheckStatus();
         if(!isDead) {
+            InputBuffer();
+            CheckStatus();
             Move();
-        } else {
         }
     }
 
@@ -95,6 +93,7 @@ public class Player : MonoBehaviour {
 
     private void OnCollisionEnter2D(Collision2D collision) {
         if(collision.gameObject.tag == "Pacman" && !isDead) {
+            isDead = true;
             Defeat();
         }
     }
@@ -110,11 +109,8 @@ public class Player : MonoBehaviour {
     }
 
     public void Defeat() { //やられた時の処理
-        isDead = true;
-        this.buffer = new Vector2(0, 0);
-
+        buffer = new Vector2(0, 0);
         StartCoroutine(BackToNest());
-
     }
 
     IEnumerator MoveCoroutine(Vector3 pos, float time) {
