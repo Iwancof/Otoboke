@@ -21,6 +21,8 @@ public class Player : MonoBehaviour {
     float time = 0.05f;
     public float speed = 1.0f;
     public float delta = 0.001f;
+    [SerializeField, HeaderAttribute ("うまく曲がれないときに大きくする"), Range(0, 10)]
+    public float gap = 3.0f;
     public static Vector3 respownPoint;
     int[][] root;
 
@@ -46,15 +48,19 @@ public class Player : MonoBehaviour {
 
 
     void CheckStatus() {
-        status[Vector2.up.ToString()]    = !Physics2D.Raycast(transform.position + transform.up * rad, transform.up, delta);
-        status[Vector2.right.ToString()] = !Physics2D.Raycast(transform.position - transform.up * rad, transform.right, rad + delta);
-        status[Vector2.down.ToString()]  = !Physics2D.Raycast(transform.position - transform.up * rad, -transform.up, delta);
-        status[Vector2.left.ToString()]  = !Physics2D.Raycast(transform.position - transform.up * rad, -transform.right, rad + delta);
+        status[Vector2.up.ToString()]    = !Physics2D.Raycast(transform.position + transform.up * rad, transform.up, 0.5f);
+        status[Vector2.right.ToString()] = !Physics2D.Raycast(transform.position - transform.up * (rad - delta * gap) + transform.right * (rad - delta), transform.right, 0.5f) &&
+                                           !Physics2D.Raycast(transform.position + transform.up * (rad - delta * gap) + transform.right * (rad - delta), transform.right, 0.5f);
+        status[Vector2.down.ToString()]  = !Physics2D.Raycast(transform.position - transform.up * rad, -transform.up, 0.5f);
+        status[Vector2.left.ToString()]  = !Physics2D.Raycast(transform.position - transform.up * (rad - delta * gap) - transform.right * (rad - delta), -transform.right, 0.5f) &&
+                                           !Physics2D.Raycast(transform.position + transform.up * (rad - delta * gap) - transform.right * (rad - delta), -transform.right, 0.5f);
 
         Debug.DrawRay(transform.position + transform.up * rad, transform.up * rad);
-        Debug.DrawRay(transform.position - transform.up * rad, transform.right * rad, Color.blue);
+        Debug.DrawRay(transform.position - transform.up * (rad - delta * gap) + transform.right * (rad - delta), transform.right * 0.5f, Color.blue);
+        Debug.DrawRay(transform.position + transform.up * (rad - delta * gap) + transform.right * (rad - delta), transform.right * 0.5f, Color.blue);
         Debug.DrawRay(transform.position - transform.up * rad, -transform.up * rad, Color.red);
-        Debug.DrawRay(transform.position - transform.up * rad, -transform.right * rad, Color.yellow);
+        Debug.DrawRay(transform.position - transform.up * (rad - delta * gap) - transform.right * (rad - delta), -transform.right * 0.5f, Color.yellow);
+        Debug.DrawRay(transform.position + transform.up * (rad - delta * gap) - transform.right * (rad - delta), -transform.right * 0.5f, Color.yellow);
     }
 
     void InputBuffer() {
@@ -166,6 +172,7 @@ public class Player : MonoBehaviour {
             pos = GetCoordinate(transform.position);
         }
 
+        transform.rotation = Quaternion.identity;
         isDead = false;
         yield break;
     }

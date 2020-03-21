@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3057855724983714452}
   - component: {fileID: 2102521361678725987}
   - component: {fileID: 3735515981254577479}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Bait
   m_TagString: Bait
   m_Icon: {fileID: 0}
