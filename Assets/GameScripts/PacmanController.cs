@@ -41,9 +41,9 @@ public class PacmanController: MonoBehaviour
         CheckStatus();
 
         if (rb.velocity == Vector2.zero) {
-            anim.SetBool("move", false);
+            anim.speed = 0;
         } else {
-            anim.SetBool("move", true);
+            anim.speed = 1.0f;
         }
         prevPos = transform.position;
         Move(targetPos, time);
