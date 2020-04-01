@@ -6,6 +6,7 @@ public class PacmanController: MonoBehaviour
 {
     Animator anim;
     Vector3 firstPos;
+    Vector3 nowPos;
     Vector3 prevPos;
     Vector3 distance;
     public Vector3 targetPos;
@@ -18,6 +19,9 @@ public class PacmanController: MonoBehaviour
 
     Rigidbody2D rb;
     Dictionary<string, bool> status = new Dictionary<string, bool>();   // Playerから見た方向
+
+    [SerializeField, HeaderAttribute ("うまく曲がれないときに大きくする"), Range (0, 10)]
+    public float gap = 3.0f;
     float rad = 0f;
     public float speed = 1.0f;
     public float delta = 0.001f;
@@ -26,6 +30,7 @@ public class PacmanController: MonoBehaviour
     {
         anim = GetComponent<Animator>();
         prevPos = transform.position;
+        nowPos = transform.position;
 
         rb = gameObject.GetComponent<Rigidbody2D>();
         rad = gameObject.GetComponent<CircleCollider2D>().radius;
@@ -38,27 +43,37 @@ public class PacmanController: MonoBehaviour
 
     void Update()
     {
-        CheckStatus();
-
-        if (rb.velocity == Vector2.zero) {
-            anim.speed = 0;
-        } else {
+        //CheckStatus();
+        Move(targetPos, time);
+        nowPos = transform.position;
+        if (prevPos.x < nowPos.x) {
             anim.speed = 1.0f;
+            anim.SetBool ("right", true);
+            anim.SetBool ("left", false);
+            anim.SetBool ("up", false);
+            anim.SetBool ("down", false);
+        } else if (prevPos.x > nowPos.x) {
+            anim.speed = 1.0f;
+            anim.SetBool ("right", false);
+            anim.SetBool ("left", true);
+            anim.SetBool ("up", false);
+            anim.SetBool ("down", false);
+        } else if (prevPos.y < nowPos.y) {
+            anim.speed = 1.0f;
+            anim.SetBool ("right", false);
+            anim.SetBool ("left", false);
+            anim.SetBool ("up", true);
+            anim.SetBool ("down", false);
+        } else if (prevPos.y > nowPos.y) {
+            anim.speed = 1.0f;
+            anim.SetBool ("right", false);
+            anim.SetBool ("left", false);
+            anim.SetBool ("up", false);
+            anim.SetBool ("down", true);
+        } else {
+            anim.speed = 0;
         }
         prevPos = transform.position;
-        Move(targetPos, time);
-    }
-
-    void CheckStatus() {
-        status[Vector2.up.ToString()]    = !Physics2D.Raycast(transform.position + transform.right * rad, transform.right, delta);
-        status[Vector2.right.ToString()] = !Physics2D.Raycast(transform.position - transform.right * rad, -transform.up, rad + delta);
-        status[Vector2.down.ToString()]  = !Physics2D.Raycast(transform.position - transform.right * rad, -transform.right, delta);
-        status[Vector2.left.ToString()]  = !Physics2D.Raycast(transform.position - transform.right * rad, transform.up, rad + delta);
-
-        Debug.DrawRay(transform.position + transform.right * rad, transform.right * rad);
-        Debug.DrawRay(transform.position - transform.right * rad, -transform.up * rad, Color.blue);
-        Debug.DrawRay(transform.position - transform.right * rad, -transform.right * rad, Color.red);
-        Debug.DrawRay(transform.position - transform.right * rad, transform.up * rad, Color.yellow);
     }
 
     // posの座標までtime秒間かけて移動
@@ -104,4 +119,22 @@ public class PacmanController: MonoBehaviour
                 break;
         }
     }
+
+    /*
+    void CheckStatus() {
+        status[Vector2.up.ToString ()] = !Physics2D.Raycast (transform.position + transform.up * rad, transform.up, 0.5f);
+        status[Vector2.right.ToString ()] = !Physics2D.Raycast (transform.position - transform.up * (rad - delta * gap) + transform.right * (rad - delta), transform.right, 0.5f) &&
+            !Physics2D.Raycast (transform.position + transform.up * (rad - delta * gap) + transform.right * (rad - delta), transform.right, 0.5f);
+        status[Vector2.down.ToString ()] = !Physics2D.Raycast (transform.position - transform.up * rad, -transform.up, 0.5f);
+        status[Vector2.left.ToString ()] = !Physics2D.Raycast (transform.position - transform.up * (rad - delta * gap) - transform.right * (rad - delta), -transform.right, 0.5f) &&
+            !Physics2D.Raycast (transform.position + transform.up * (rad - delta * gap) - transform.right * (rad - delta), -transform.right, 0.5f);
+
+        Debug.DrawRay (transform.position + transform.up * rad, transform.up * rad);
+        Debug.DrawRay (transform.position - transform.up * (rad - delta * gap) + transform.right * (rad - delta), transform.right * 0.5f, Color.blue);
+        Debug.DrawRay (transform.position + transform.up * (rad - delta * gap) + transform.right * (rad - delta), transform.right * 0.5f, Color.blue);
+        Debug.DrawRay (transform.position - transform.up * rad, -transform.up * rad, Color.red);
+        Debug.DrawRay (transform.position - transform.up * (rad - delta * gap) - transform.right * (rad - delta), -transform.right * 0.5f, Color.yellow);
+        Debug.DrawRay (transform.position + transform.up * (rad - delta * gap) - transform.right * (rad - delta), -transform.right * 0.5f, Color.yellow);
+    }*/
+
 }
