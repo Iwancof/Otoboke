@@ -26,6 +26,11 @@ public class PacmanController: MonoBehaviour
     public float speed = 1.0f;
     public float delta = 0.001f;
 
+    [SerializeField]
+    AudioClip bait0, bait1;
+    AudioSource source;
+    bool whichSound = false; // true -> bait0 , false -> bait1
+
     void Start()
     {
         anim = GetComponent<Animator>();
@@ -34,6 +39,8 @@ public class PacmanController: MonoBehaviour
 
         rb = gameObject.GetComponent<Rigidbody2D>();
         rad = gameObject.GetComponent<CircleCollider2D>().radius;
+
+        source = GetComponent<AudioSource>();
         status.Add(Vector2.up.ToString(), false);
         status.Add(Vector2.right.ToString(), false);
         status.Add(Vector2.down.ToString(), false);
@@ -110,6 +117,12 @@ public class PacmanController: MonoBehaviour
                 break;
             case "Bait":
                 PointManager.baites++;
+                whichSound = !whichSound;
+                if(whichSound)
+                    source.clip = bait0;
+                else
+                    source.clip = bait1;
+                source.Play();
                 Destroy(collision.gameObject);
                 break;
             case "PowerBait":
