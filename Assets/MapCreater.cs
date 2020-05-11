@@ -6,6 +6,7 @@ using System.Linq;
 using System;
 using System.IO;
 
+
 public class Map {
     public MapChip[][] MapData;
     //あえてジャグ配列
@@ -80,11 +81,87 @@ public class Map {
 
         return ret;
     }
+    private Sprite WallDirection(Sprite[] block,int direction, int x, int yIdx) {
+        Sprite tmp;
+        switch(direction) {
+            case 0b1000:
+            case 0b0010:
+            case 0b1010:
+                // 上下
+                tmp = block[9];
+                break;
+            case 0b0100:
+            case 0b0001:
+            case 0b0101:
+                // 左右
+                tmp = block[10];
+                break;
+            case 0b1111:
+                // 全方向
+                if(yIdx-1 >= 0 && x-1 >= 0 && MapData[x-1][yIdx-1] != MapChip.Wall) {
+                    // 左上が壁じゃない
+                    tmp = block[8];
+                } else if(yIdx-1 >= 0 && x+1 < Width && MapData[x+1][yIdx-1] != MapChip.Wall) {
+                    // 右上が壁じゃない
+                    tmp = block[6];
+                } else if(yIdx+1 < Height && x-1 >= 0 && MapData[x-1][yIdx+1] != MapChip.Wall) {
+                    // 左下が壁じゃない
+                    tmp = block[2];
+                } else if(yIdx+1 < Height && x+1 < Width && MapData[x+1][yIdx+1] != MapChip.Wall) {
+                    // 右下が壁じゃない
+                    tmp = block[0];
+                } else {
+                    tmp = null;
+                }
+                break;
+            case 0b0110:
+                // 右下
+                tmp = block[0];
+                break;
+            case 0b0011:
+                // 下左
+                tmp = block[2];
+                break;
+            case 0b1100:
+                // 上右
+                tmp = block[6];
+                break;
+            case 0b1001:
+                // 上左
+                tmp = block[8];
+                break;
+            case 0b1011:
+                // 上下左
+                //tmp = block[5];
+                tmp = block[9];
+                break;
+            case 0b1101:
+                // 上右左
+                //tmp = block[7];
+                tmp = block[10];
+                break;
+            case 0b0111:
+                // 右下左
+                //tmp = block[1];
+                tmp = block[10];
+                break;
+            case 0b1110:
+                // 上右下
+                //tmp = block[3];
+                tmp = block[9];
+                break;
+            default:
+                tmp = null;
+                break;
+        }
+        return tmp;
+    }
 
     public void OverwriteTile() {
         var wall_object = (GameObject)Resources.Load("WallBlock");
         var bait_object = (GameObject)Resources.Load("Bait");
         var powerBait_object = (GameObject)Resources.Load("PowerBait");
+        Sprite[] block = Resources.LoadAll<Sprite>("stage");
         float size = 1.05f;
         Vector3 Point1 = new Vector3(0, 0, 0), Point2 = new Vector3(0, 0, 0);
         GameObject TeleportObj1 = null, TeleportObj2 = null;
@@ -96,11 +173,23 @@ public class Map {
             for (int y = 0; y < Height; y++) {
                 var pos = new Vector3(x * size, y * size, 0);
                 str += ((int)MapData[x][Height - y - 1]).ToString();
-                switch (MapData[x][Height - y - 1]) {
+                // マップのタイプ
+                var yIdx = Height - y - 1;
+                switch (MapData[x][yIdx]) {
                     case MapChip.Wall:
-                        var obj = MonoBehaviour.Instantiate(wall_object, new Vector3(x * size, y * size, 0), Quaternion.identity);
+                        // 壁のテクスチャ分岐
+                        var direction = 0b0000;//(false, false, false, false); // up, right, down, left
+                        if(yIdx-1 >= 0 && MapData[x][yIdx-1] == MapChip.Wall) direction |= 0b1000;
+                        if(x+1 < Width && MapData[x+1][yIdx] == MapChip.Wall) direction |= 0b0100;
+                        if(yIdx+1 < Height && MapData[x][yIdx+1] == MapChip.Wall) direction |= 0b0010;
+                        if(x-1 >= 0 && MapData[x-1][yIdx] == MapChip.Wall) direction |= 0b0001;
+                        //Vector3 inspos = new Vector3(x * size, y * size, 0);
+                        GameObject obj;
+                        obj = MonoBehaviour.Instantiate(wall_object, new Vector3(x * size, y * size, 0), Quaternion.identity);
                         obj.name = $"WallBlock_[{x},{y}]";
                         obj.transform.parent = map.transform;
+                        Sprite tmp = WallDirection(block, direction, x, yIdx);
+                        obj.GetComponent<SpriteRenderer>().sprite = tmp;
                         break;
                     case MapChip.Respown:
                         if (isRespownPointSet) throw MapCreateException.RespownPointDuplication;
