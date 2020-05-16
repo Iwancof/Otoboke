@@ -115,6 +115,7 @@ public class PacmanController: MonoBehaviour
             case "Teleport":
                 this.transform.position = MapController.map.TeleportPoint[collision.gameObject];
                 break;
+            /*
             case "Bait":
                 PointManager.baites++;
                 whichSound = !whichSound;
@@ -130,6 +131,7 @@ public class PacmanController: MonoBehaviour
                 PointManager.hasPower = true;
                 Destroy(collision.gameObject);
                 break;
+            */
         }
     }
 

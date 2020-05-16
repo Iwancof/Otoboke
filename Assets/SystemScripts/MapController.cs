@@ -40,6 +40,7 @@ public class MapController : MonoBehaviour {
         nm.ProcessReservation((string str) => {
             map = Map.CreateByString(str);
             isMapReceived = true;
+            //nm.WriteLine("MAP_RECEIVED|");
         }, "Map");
 
         nm.ProcessReservation((string str) => {
@@ -51,7 +52,7 @@ public class MapController : MonoBehaviour {
         textobj = GameObject.Find("LogText").GetComponent<Text>();
     }
 
-    LoopTimer communicateCoordinate = new LoopTimer(0.2f);
+    LoopTimer communicateCoordinate = new LoopTimer(0.08f);
     LoopTimer test_player_defeat = new LoopTimer(15f);
     LoopTimer print_player_coordinate = new LoopTimer(0.1f);
     LoopTimer test_print_queue = new LoopTimer(0.2f);
@@ -91,8 +92,12 @@ public class MapController : MonoBehaviour {
                 } else if (get_data.Tag == "PACMAN") {
                     PacmanTemporaryCoordinate = JsonUtility.FromJson<PacmanCoordinateForJson>(get_data.Data);
                     canPacmanUpdateCoordinate = true;
+                } else if (get_data.Tag == "PACCOL") {
+                    PacedCoordinateForJson paced_crd = JsonUtility.FromJson<PacedCoordinateForJson>(get_data.Data);
+
+
                 } else {
-                    throw new Exception("Invalid tag");
+                    throw new Exception($"{get_data.Tag} is Invalid tag. ");
                 }
 
             }
@@ -100,10 +105,12 @@ public class MapController : MonoBehaviour {
 
         }
 
-        if (test_print_queue.reached)
-            nm.QueueLog();
+        if (test_print_queue.reached) {
+            //nm.QueueLog();
+        }
 
         if (isMapDeployed && communicateCoordinate.reached) {
+            Debug.Log("sent!!!!!!!!!!!!!!");
             nm.WriteLine(
                 $"{player.transform.position.x}," +
                 $"{player.transform.position.y}," +
@@ -230,6 +237,11 @@ public class ClientCoordinateForJson {
 [System.Serializable]
 public class PacmanCoordinateForJson {
     public CoordinateForJson Pacman;
+}
+
+[System.Serializable]
+public class PacedCoordinateForJson {
+    public CoordinateForJson[] Coordinate;
 }
 
 [System.Serializable]
