@@ -117,6 +117,7 @@ public class PacmanController: MonoBehaviour
                 break;
             /*
             case "Bait":
+                if(PointManager.baites == -1) PointManager.baites = 0;
                 PointManager.baites++;
                 whichSound = !whichSound;
                 if(whichSound)
@@ -127,6 +128,8 @@ public class PacmanController: MonoBehaviour
                 Destroy(collision.gameObject);
                 break;
             case "PowerBait":
+                if(PointManager.baites == -1) PointManager.baites = 0;
+                PointManager.baites++;
                 PointManager.startTime = Time.timeSinceLevelLoad;
                 PointManager.hasPower = true;
                 Destroy(collision.gameObject);

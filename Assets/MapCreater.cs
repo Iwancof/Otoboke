@@ -226,6 +226,11 @@ public class Map {
         
         GameObject.FindWithTag("Player").GetComponent<Player>().RootSearch();
 
+        GameObject[] objects = GameObject.FindGameObjectsWithTag("Bait");
+        PointManager.numofBite = objects.Length;
+        objects = GameObject.FindGameObjectsWithTag("PowerBait");
+        PointManager.numofBite += objects.Length;
+
         //if (TeleportObj1 != null && TeleportObj2 != null) {
         TeleportPoint.Add(
             GameObject.Find("Teleport_1"),

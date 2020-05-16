@@ -17,6 +17,8 @@ public class Title : MonoBehaviour {
         initialArrowCoordinate = 
             GameObject.Find("Canvas").transform.position +
             new Vector3(11, 15, 0);
+        canStartGame = false;
+        isConnectingServer = false;
     }
 
     float time = 0f;
@@ -24,7 +26,7 @@ public class Title : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         if(canStartGame) {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("SampleScene");
+            //UnityEngine.SceneManagement.SceneManager.LoadScene("SampleScene");
             return;
         }
 
