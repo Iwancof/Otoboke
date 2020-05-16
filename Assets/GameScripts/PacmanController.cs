@@ -115,6 +115,7 @@ public class PacmanController: MonoBehaviour
             case "Teleport":
                 this.transform.position = MapController.map.TeleportPoint[collision.gameObject];
                 break;
+            /*
             case "Bait":
                 if(PointManager.baites == -1) PointManager.baites = 0;
                 PointManager.baites++;
@@ -133,6 +134,7 @@ public class PacmanController: MonoBehaviour
                 PointManager.hasPower = true;
                 Destroy(collision.gameObject);
                 break;
+            */
         }
     }
 
