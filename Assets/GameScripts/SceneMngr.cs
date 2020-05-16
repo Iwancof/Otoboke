@@ -20,7 +20,7 @@ public class SceneMngr : MonoBehaviour
         switch(currentSceneString) {
             case "GameOver": currentScene = SceneType.GameOver; break;
             case "Title": currentScene = SceneType.Title; break;
-            case "SampleScene": currentScene = SceneType.GameMain; break;
+            case "GameMain": currentScene = SceneType.GameMain; break;
             default: currentScene = SceneType.Title; break;
         }
         switch(currentScene) {
@@ -46,7 +46,7 @@ public class SceneMngr : MonoBehaviour
         switch(currentScene) {
             case SceneType.Title: {
                 if(Title.canStartGame) {
-                    SceneManager.LoadScene("SampleScene");
+                    SceneManager.LoadScene("GameMain");
                 }
                 break;
             }
