@@ -33,5 +33,6 @@ public class PointManager : MonoBehaviour
             // ゲームオーバー処理
             defeat = true;
         }
+        
     }
 }

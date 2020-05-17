@@ -91,7 +91,6 @@ public class NetworksManager {
         str += '\n';
         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(str);
         stream.Write(bytes, 0, bytes.Length);
-        Debug.Log($"sent ... {str}");
     }
 
     public void QueueLog() {

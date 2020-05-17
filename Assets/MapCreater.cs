@@ -14,6 +14,7 @@ public class Map {
     public int Height { get; private set; }
     public int Width { get; private set; }
     public Dictionary<GameObject,Vector3> TeleportPoint = new Dictionary<GameObject, Vector3>();
+    public Dictionary<(int x, int y), GameObject> DestroyList = new Dictionary<(int x, int y), GameObject>();
 
     public Map(int height,int width) {
         Height = height;
@@ -169,7 +170,7 @@ public class Map {
         bool isRespownPointSet = false;
 
         var str = "";
-        for (int x = 0;x < Width;x++) {
+        for (int x = 0; x < Width; x++) {
             for (int y = 0; y < Height; y++) {
                 var pos = new Vector3(x * size, y * size, 0);
                 str += ((int)MapData[x][Height - y - 1]).ToString();
@@ -212,11 +213,18 @@ public class Map {
                         obj = MonoBehaviour.Instantiate(bait_object, pos, Quaternion.identity);
                         obj.name = $"Bait_[{x},{y}]";
                         obj.transform.parent = map.transform;
+                        /*
+                        if(Vector3.Distance(pos, new Vector3(12.6f, 11.55f, 0)) < 0.1f) {
+                            Debug.Log($"bait at {x}, {y}");
+                        }
+                        */
+                        DestroyList.Add((x, y - 1), obj);
                         break;
                     case MapChip.PowerBait:
                         obj = MonoBehaviour.Instantiate(powerBait_object, pos, Quaternion.identity);
                         obj.name = $"PowerBait_[{x},{y}]";
                         obj.transform.parent = map.transform;
+                        DestroyList.Add((x, y - 1), obj);
                         break;
                 }
             }

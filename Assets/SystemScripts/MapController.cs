@@ -24,10 +24,11 @@ public class MapController : MonoBehaviour {
     Dictionary<int, GameObject> players;
     ClientCoordinateForJson PlayerTemporaryCoordinate;
     PacmanCoordinateForJson PacmanTemporaryCoordinate;
+    List<(int x, int y)> PacedTemporaryCoordinates = new List<(int x, int y)>();
     Text textobj;
     public static CancellationTokenSource tokenSource = new CancellationTokenSource();
     private Color[] Colors = { Color.red, Color.green, Color.blue };
-    float size = 1.05f; //this will fix
+    public static float size = 1.05f; //this will fix
 
     GameObject test_object;
 
@@ -53,6 +54,7 @@ public class MapController : MonoBehaviour {
     }
 
     LoopTimer communicateCoordinate = new LoopTimer(0.08f);
+    LoopTimer update_bait_by_server = new LoopTimer(0.08f);
     LoopTimer test_player_defeat = new LoopTimer(15f);
     LoopTimer print_player_coordinate = new LoopTimer(0.1f);
     LoopTimer test_print_queue = new LoopTimer(0.2f);
@@ -94,8 +96,9 @@ public class MapController : MonoBehaviour {
                     canPacmanUpdateCoordinate = true;
                 } else if (get_data.Tag == "PACCOL") {
                     PacedCoordinateForJson paced_crd = JsonUtility.FromJson<PacedCoordinateForJson>(get_data.Data);
-
-
+                    foreach (var e in paced_crd.Coordinate) {
+                        PacedTemporaryCoordinates.Add(((int)e.x, (int)e.y));
+                    }
                 } else {
                     throw new Exception($"{get_data.Tag} is Invalid tag. ");
                 }
@@ -105,12 +108,21 @@ public class MapController : MonoBehaviour {
 
         }
 
+        if(update_bait_by_server.reached) {
+            foreach(var e in PacedTemporaryCoordinates) {
+                //Debug.Log($"({e.x}, {e.y})");
+                //Debug.Log("Destroy ... " + map.DestroyList[(e.x, e.y)]);
+                pacmanController.PacBaitAt(e.x, e.y);
+            }
+            PacedTemporaryCoordinates = new List<(int x, int y)>();
+        }
+
+
         if (test_print_queue.reached) {
             //nm.QueueLog();
         }
 
         if (isMapDeployed && communicateCoordinate.reached) {
-            Debug.Log("sent!!!!!!!!!!!!!!");
             nm.WriteLine(
                 $"{player.transform.position.x}," +
                 $"{player.transform.position.y}," +

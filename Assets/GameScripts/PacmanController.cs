@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class PacmanController: MonoBehaviour
 {
@@ -19,6 +20,7 @@ public class PacmanController: MonoBehaviour
 
     Rigidbody2D rb;
     Dictionary<string, bool> status = new Dictionary<string, bool>();   // Playerから見た方向
+    List<GameObject> Baits;
 
     [SerializeField, HeaderAttribute ("うまく曲がれないときに大きくする"), Range (0, 10)]
     public float gap = 3.0f;
@@ -46,6 +48,8 @@ public class PacmanController: MonoBehaviour
         status.Add(Vector2.down.ToString(), false);
         status.Add(Vector2.left.ToString(), false);
         status.Add(Vector2.zero.ToString(), false);
+
+        Baits = new List<GameObject>(GameObject.FindGameObjectsWithTag("Bait"));
     }
 
     void Update()
@@ -137,6 +141,38 @@ public class PacmanController: MonoBehaviour
             */
         }
     }
+    public void PacBaitAt(int x, int y) {
+        switch (MapController.map.MapData[x][y]) {
+            case MapChip.Bait:
+                if (PointManager.baites == -1) PointManager.baites = 0;
+                PointManager.baites++;
+                whichSound = !whichSound;
+                if (whichSound)
+                    source.clip = bait0;
+                else
+                    source.clip = bait1;
+                source.Play();
+                Destroy(FindBaitObjectByCoordinate(x, y));
+                break;
+            case MapChip.PowerBait:
+                if (PointManager.baites == -1) PointManager.baites = 0;
+                PointManager.baites++;
+                PointManager.startTime = Time.timeSinceLevelLoad;
+                PointManager.hasPower = true;
+                Destroy(FindBaitObjectByCoordinate(x, y));
+                break;
+        }
+    }
+
+    public GameObject FindBaitObjectByCoordinate(float px,float py) =>
+        Baits
+            .Select(x =>
+                (x, Vector3.Distance(
+                    x.transform.position,
+                    new Vector3(px * MapController.size, py * MapController.size, 0))
+                ))
+            .OrderBy(x => x.Item2)
+            .ToList()[0].x;
 
     /*
     void CheckStatus() {
