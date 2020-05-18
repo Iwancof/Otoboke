@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 685005415845716971}
   m_Layer: 2
   m_Name: PowerBait
-  m_TagString: PowerBait
+  m_TagString: Bait
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
