@@ -27,36 +27,6 @@ public class Map {
                 MapData[x][y] = MapChip.None;
             }
         }
-        /*
-        int[,] tmp_map = {
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0, },
-            {1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0, },
-            {1,0,1,1,0,1,1,0,1,0,1,1,0,1,1,0,1,0,0, },
-            {1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0, },
-            {1,0,1,1,0,1,0,1,1,1,0,1,0,1,1,0,1,0,0, },
-            {1,0,0,0,0,1,0,0,1,0,0,1,0,0,0,0,1,0,0, },
-            {1,1,1,1,0,1,1,0,1,0,1,1,0,1,1,1,1,0,0, },
-            {1,1,1,1,0,1,0,0,1,0,0,1,0,1,1,1,1,0,0, },
-
-            {1,1,1,1,0,1,0,0,0,0,0,1,0,1,1,1,1,0,0, },
-            {0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0, },
-            {1,1,1,1,0,1,0,0,0,0,0,1,0,1,1,1,1,0,0, },
-
-            {1,1,1,1,0,1,0,0,1,0,0,1,0,1,1,1,1,0,0, },
-            {1,1,1,1,0,1,1,0,1,0,1,1,0,1,1,1,1,0,0, },
-            {1,0,0,0,0,1,0,0,1,0,0,1,0,0,0,0,1,0,0, },
-            {1,0,1,1,0,1,0,1,1,1,0,1,0,1,1,0,1,0,0, },
-            {1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0, },
-            {1,0,1,1,0,1,1,0,1,0,1,1,0,1,1,0,1,0,0, },
-            {1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0, },
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0, },
-        };
-        for(int i = 0;i < 19;i++) {
-            for(int j = 0;j < 19;j++) {
-                MapData[i][j] = (MapChip)tmp_map[j, i];
-            }
-        }
-        */
     }
 
     public void ShowInConsole() {
@@ -84,76 +54,48 @@ public class Map {
     }
     private Sprite WallDirection(Sprite[] block,int direction, int x, int yIdx) {
         Sprite tmp;
-        switch(direction) {
-            case 0b1000:
-            case 0b0010:
-            case 0b1010:
-                // 上下
-                tmp = block[9];
-                break;
-            case 0b0100:
-            case 0b0001:
-            case 0b0101:
-                // 左右
-                tmp = block[10];
-                break;
-            case 0b1111:
-                // 全方向
-                if(yIdx-1 >= 0 && x-1 >= 0 && MapData[x-1][yIdx-1] != MapChip.Wall) {
-                    // 左上が壁じゃない
-                    tmp = block[8];
-                } else if(yIdx-1 >= 0 && x+1 < Width && MapData[x+1][yIdx-1] != MapChip.Wall) {
-                    // 右上が壁じゃない
-                    tmp = block[6];
-                } else if(yIdx+1 < Height && x-1 >= 0 && MapData[x-1][yIdx+1] != MapChip.Wall) {
-                    // 左下が壁じゃない
-                    tmp = block[2];
-                } else if(yIdx+1 < Height && x+1 < Width && MapData[x+1][yIdx+1] != MapChip.Wall) {
-                    // 右下が壁じゃない
-                    tmp = block[0];
-                } else {
-                    tmp = null;
-                }
-                break;
-            case 0b0110:
-                // 右下
-                tmp = block[0];
-                break;
-            case 0b0011:
-                // 下左
-                tmp = block[2];
-                break;
-            case 0b1100:
-                // 上右
-                tmp = block[6];
-                break;
-            case 0b1001:
-                // 上左
+        tmp = new MySwitch<int, Sprite>(direction)
+             // 上下
+            .Case(0b1000, block[9])
+            .Case(0b0010)
+            .Case(0b1010)
+            .Case(0b1011)
+            .Case(0b1110)
+            // 左右
+            .Case(0b0100, block[10])
+            .Case(0b0001)
+            .Case(0b0101)
+            .Case(0b1101)
+            .Case(0b0111)
+            // 全方向
+            .Case(0b1111, null)
+            // 右下
+            .Case(0b0110, block[0])
+            // 下左
+            .Case(0b0011, block[2])
+            // 上右
+            .Case(0b1100, block[6])
+            // 上左
+            .Case(0b1001, block[8])
+            .Default(null);
+
+        // 全方向
+        if (direction == 0b1111) {
+            if(yIdx-1 >= 0 && x-1 >= 0 && MapData[x-1][yIdx-1] != MapChip.Wall) {
+                // 左上が壁じゃない
                 tmp = block[8];
-                break;
-            case 0b1011:
-                // 上下左
-                //tmp = block[5];
-                tmp = block[9];
-                break;
-            case 0b1101:
-                // 上右左
-                //tmp = block[7];
-                tmp = block[10];
-                break;
-            case 0b0111:
-                // 右下左
-                //tmp = block[1];
-                tmp = block[10];
-                break;
-            case 0b1110:
-                // 上右下
-                //tmp = block[3];
-                tmp = block[9];
-                break;
-            default:
+            } else if(yIdx-1 >= 0 && x+1 < Width && MapData[x+1][yIdx-1] != MapChip.Wall) {
+                // 右上が壁じゃない
+                tmp = block[6];
+            } else if(yIdx+1 < Height && x-1 >= 0 && MapData[x-1][yIdx+1] != MapChip.Wall) {
+                // 左下が壁じゃない
+                tmp = block[2];
+            } else if(yIdx+1 < Height && x+1 < Width && MapData[x+1][yIdx+1] != MapChip.Wall) {
+                // 右下が壁じゃない
+                tmp = block[0];
+            } else {
                 tmp = null;
-                break;
+            }
         }
         return tmp;
     }
@@ -301,4 +243,63 @@ public class MapCreateException : Exception {
     }
     public static MapCreateException RespownPointDuplication = 
         new MapCreateException("Respown point must not be more than two.");
+}
+
+
+/// <summary>
+/// switch式が使えない環境で同じような機能を提供します。最後に必ずDefaultを挿入する必要があります。
+/// </summary>
+/// <typeparam name="U">比較対象の型</typeparam>
+/// <typeparam name="T">式の返り値の型</typeparam>
+class MySwitch<U, T> {
+    // T:switchで返す値の型
+    // U:switchで比較する型
+    T res;
+    T prevNum;
+    dynamic cmp = default(U);
+    private bool match = false;
+
+    public MySwitch(U obj) {
+        this.cmp = obj;
+    }
+
+    /// <summary>
+    /// case句
+    /// </summary>
+    /// <param name="targ">比較のラベル</param>
+    /// <param name="num">マッチした場合の値</param>
+    /// <returns></returns>
+    public MySwitch<U, T> Case(U targ, T num) {
+        if(targ.Equals(cmp)) {
+            match = true;
+            res = num;
+        }
+        prevNum = num;
+        return this;
+    }
+
+    /// <summary>
+    /// case句のフォールスルー
+    /// 当てはまる場合の返り値は連続する条件のはじめに書く必要があります。
+    /// </summary>
+    /// <param name="targ">比較のラベル</param>
+    public MySwitch<U, T> Case(U targ) {
+        if(targ.Equals(cmp)) {
+            match = true;
+            res = prevNum;
+        }
+        return this;
+    }
+    /// <summary>
+    /// default句
+    /// </summary>
+    /// <param name="num">デフォルトの値</param>
+    /// <returns></returns>
+    public T Default(T num) {
+        if (match) {
+            return res;
+        } else {
+            return num;
+        }
+    }
 }
