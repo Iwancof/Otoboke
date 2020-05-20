@@ -20,7 +20,7 @@ public class PacmanController: MonoBehaviour
 
     Rigidbody2D rb;
     Dictionary<string, bool> status = new Dictionary<string, bool>();   // Playerから見た方向
-    List<GameObject> Baits;
+    public List<GameObject> Baits;
 
     [SerializeField, HeaderAttribute ("うまく曲がれないときに大きくする"), Range (0, 10)]
     public float gap = 3.0f;
@@ -49,7 +49,6 @@ public class PacmanController: MonoBehaviour
         status.Add(Vector2.left.ToString(), false);
         status.Add(Vector2.zero.ToString(), false);
 
-        Baits = new List<GameObject>(GameObject.FindGameObjectsWithTag("Bait"));
     }
 
     void Update()
@@ -110,7 +109,7 @@ public class PacmanController: MonoBehaviour
         transform.position = firstPos + distance * rate;
     }
     private void OnTriggerEnter2D(Collider2D collision) {
-        Debug.Log("Collision!!!!");
+        //Debug.Log("Collision!!!!");
         /*
         if(collision.tag == "Teleport") {
             this.transform.position = MapController.map.TeleportPoint[collision.gameObject];
@@ -164,15 +163,19 @@ public class PacmanController: MonoBehaviour
         }
     }
 
-    public GameObject FindBaitObjectByCoordinate(float px,float py) =>
-        Baits
+    public GameObject FindBaitObjectByCoordinate(float px, float py) {
+        var ret_obj = Baits
+            .Select((e, i) => (e, i))
             .Select(x =>
                 (x, Vector3.Distance(
-                    x.transform.position,
+                    x.e.transform.position,
                     new Vector3(px * MapController.size, py * MapController.size, 0))
                 ))
-            .OrderBy(x => x.Item2)
-            .ToList()[0].x;
+            .OrderBy(x => x.Item2);
+        var ret = ret_obj.First();
+        Baits.RemoveAt(ret.x.i);
+        return ret.x.e;
+    }
 
     /*
     void CheckStatus() {

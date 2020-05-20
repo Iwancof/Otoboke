@@ -82,6 +82,7 @@ public class MapController : MonoBehaviour {
         if (!isMapDeployed && isMapReceived) {
             map.OverwriteTile();
             isMapDeployed = true;
+            pacmanController.Baits = new List<GameObject>(GameObject.FindGameObjectsWithTag("Bait"));
 
             void tmp_func(string str) {
                 nm.ProcessReservation(tmp_func, "Get coordinate LoopCast()A");
@@ -110,7 +111,7 @@ public class MapController : MonoBehaviour {
 
         if(update_bait_by_server.reached) {
             foreach(var e in PacedTemporaryCoordinates) {
-                //Debug.Log($"({e.x}, {e.y})");
+                Debug.Log($"({e.x}, {e.y})");
                 //Debug.Log("Destroy ... " + map.DestroyList[(e.x, e.y)]);
                 pacmanController.PacBaitAt(e.x, e.y);
             }
