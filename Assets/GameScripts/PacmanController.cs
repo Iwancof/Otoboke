@@ -141,6 +141,30 @@ public class PacmanController: MonoBehaviour
         }
     }
     public void PacBaitAt(int x, int y) {
+        var paced_object = FindBaitObjectByCoordinate(x, y);
+        switch(paced_object.Item1) {
+            case MapChip.Bait:
+                if (PointManager.baites == -1) PointManager.baites = 0;
+                PointManager.baites++;
+                whichSound = !whichSound;
+                if (whichSound)
+                    source.clip = bait0;
+                else
+                    source.clip = bait1;
+                source.Play();
+                Destroy(paced_object.Item2);
+                break;
+            case MapChip.PowerBait:
+                if (PointManager.baites == -1) PointManager.baites = 0;
+                PointManager.baites++;
+                PointManager.startTime = Time.timeSinceLevelLoad;
+                PointManager.hasPower = true;
+                Destroy(paced_object.Item2);
+                break;
+        }
+
+
+        /*
         switch (MapController.map.MapData[x][y]) {
             case MapChip.Bait:
                 if (PointManager.baites == -1) PointManager.baites = 0;
@@ -161,9 +185,10 @@ public class PacmanController: MonoBehaviour
                 Destroy(FindBaitObjectByCoordinate(x, y));
                 break;
         }
+        */
     }
 
-    public GameObject FindBaitObjectByCoordinate(float px, float py) {
+    public (MapChip, GameObject) FindBaitObjectByCoordinate(int px, int py) {
         /*
         var ret_obj = Baits
             .Select((e, i) => (e, i))
@@ -178,7 +203,7 @@ public class PacmanController: MonoBehaviour
         Baits.RemoveAt(ret.x.i);
         return ret.x.e;
         */
-        Debug.Log(px + " : " + py);
+        Debug.Log(px + " : " + py + " in " + Map.DestroyList.Count());
         return Map.DestroyList[((int)px ,(int)py )];
     }
 
