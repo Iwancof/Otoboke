@@ -164,6 +164,7 @@ public class PacmanController: MonoBehaviour
     }
 
     public GameObject FindBaitObjectByCoordinate(float px, float py) {
+        /*
         var ret_obj = Baits
             .Select((e, i) => (e, i))
             .Select(x =>
@@ -172,9 +173,13 @@ public class PacmanController: MonoBehaviour
                     new Vector3(px * MapController.size, py * MapController.size, 0))
                 ))
             .OrderBy(x => x.Item2);
+
         var ret = ret_obj.First();
         Baits.RemoveAt(ret.x.i);
         return ret.x.e;
+        */
+        Debug.Log(px + " : " + py);
+        return Map.DestroyList[((int)px ,(int)py )];
     }
 
     /*

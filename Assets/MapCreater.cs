@@ -14,7 +14,7 @@ public class Map {
     public int Height { get; private set; }
     public int Width { get; private set; }
     public Dictionary<GameObject,Vector3> TeleportPoint = new Dictionary<GameObject, Vector3>();
-    public Dictionary<(int x, int y), GameObject> DestroyList = new Dictionary<(int x, int y), GameObject>();
+    static public Dictionary<(int x, int y), GameObject> DestroyList = new Dictionary<(int x, int y), GameObject>();
 
     public Map(int height,int width) {
         Height = height;
