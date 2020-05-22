@@ -14,7 +14,9 @@ public class Map {
     public int Height { get; private set; }
     public int Width { get; private set; }
     public Dictionary<GameObject,Vector3> TeleportPoint = new Dictionary<GameObject, Vector3>();
-    static public Dictionary<(int x, int y), GameObject> DestroyList = new Dictionary<(int x, int y), GameObject>();
+    static public Dictionary<(int x, int y), (MapChip, GameObject)> DestroyList = new Dictionary<(int x, int y), (MapChip, GameObject)>();
+
+
 
     public Map(int height,int width) {
         Height = height;
@@ -160,13 +162,13 @@ public class Map {
                             Debug.Log($"bait at {x}, {y}");
                         }
                         */
-                        DestroyList.Add((x, y - 1), obj);
+                        DestroyList.Add((x, y - 1), (MapChip.Bait, obj));
                         break;
                     case MapChip.PowerBait:
                         obj = MonoBehaviour.Instantiate(powerBait_object, pos, Quaternion.identity);
                         obj.name = $"PowerBait_[{x},{y}]";
                         obj.transform.parent = map.transform;
-                        DestroyList.Add((x, y - 1), obj);
+                        DestroyList.Add((x, y - 1), (MapChip.PowerBait, obj));
                         break;
                 }
             }
