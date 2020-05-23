@@ -25,13 +25,15 @@ public class PacmanController: MonoBehaviour
     [SerializeField, HeaderAttribute ("うまく曲がれないときに大きくする"), Range (0, 10)]
     public float gap = 3.0f;
     float rad = 0f;
-    public float speed = 1.0f;
     public float delta = 0.001f;
+
+    Vector3 speed = new Vector3();
 
     [SerializeField]
     AudioClip bait0, bait1;
     AudioSource source;
     bool whichSound = false; // true -> bait0 , false -> bait1
+
 
     void Start()
     {
@@ -53,93 +55,47 @@ public class PacmanController: MonoBehaviour
 
     void Update()
     {
-        //CheckStatus();
-        Move(targetPos, time);
-        nowPos = transform.position;
-        if (prevPos.x < nowPos.x) {
-            anim.speed = 1.0f;
-            anim.SetBool ("right", true);
-            anim.SetBool ("left", false);
-            anim.SetBool ("up", false);
-            anim.SetBool ("down", false);
-        } else if (prevPos.x > nowPos.x) {
-            anim.speed = 1.0f;
-            anim.SetBool ("right", false);
-            anim.SetBool ("left", true);
-            anim.SetBool ("up", false);
-            anim.SetBool ("down", false);
-        } else if (prevPos.y < nowPos.y) {
-            anim.speed = 1.0f;
-            anim.SetBool ("right", false);
-            anim.SetBool ("left", false);
-            anim.SetBool ("up", true);
-            anim.SetBool ("down", false);
-        } else if (prevPos.y > nowPos.y) {
-            anim.speed = 1.0f;
-            anim.SetBool ("right", false);
-            anim.SetBool ("left", false);
-            anim.SetBool ("up", false);
-            anim.SetBool ("down", true);
+        //nowPos = transform.position;
+        transform.position = Vector3.SmoothDamp(transform.position, targetPos, ref speed, time);
+
+        //if (prevPos.x < nowPos.x) {
+        if (Mathf.Abs(speed.x) > Mathf.Abs(speed.y)) {
+            if (speed.x > 0) {
+                anim.speed = 1.0f;
+                anim.SetBool ("right", true);
+                anim.SetBool ("left", false);
+                anim.SetBool ("up", false);
+                anim.SetBool ("down", false);
+            //} else if (prevPos.x > nowPos.x) {
+            } else if (speed.x < 0) {
+                anim.speed = 1.0f;
+                anim.SetBool ("right", false);
+                anim.SetBool ("left", true);
+                anim.SetBool ("up", false);
+                anim.SetBool ("down", false);
+            //} else if (prevPos.y < nowPos.y) {
+            } 
+        } else if (Mathf.Abs(speed.y) > Mathf.Abs(speed.x)) {
+            if (speed.y > 0) {
+                anim.speed = 1.0f;
+                anim.SetBool ("right", false);
+                anim.SetBool ("left", false);
+                anim.SetBool ("up", true);
+                anim.SetBool ("down", false);
+            //} else if (prevPos.y > nowPos.y) {
+            } else if (speed.y < 0) {
+                anim.speed = 1.0f;
+                anim.SetBool ("right", false);
+                anim.SetBool ("left", false);
+                anim.SetBool ("up", false);
+                anim.SetBool ("down", true);
+            }
         } else {
             anim.speed = 0;
         }
         prevPos = transform.position;
     }
 
-    // posの座標までtime秒間かけて移動
-    void Move(Vector3 pos, float time) {
-        if(firsttime) {
-            startTime = Time.timeSinceLevelLoad;
-            firstPos = transform.position;
-            this.time = time;
-            distance = pos - transform.position;
-            firsttime = false;
-        }
-        if (time <= 0) {
-            transform.position = pos;
-            return;
-        }
-        diff = Time.timeSinceLevelLoad - startTime;
-        var rate = diff / time;
-        if(rate >= 1) {
-            firsttime = true;
-            return;
-        }
-
-        transform.position = firstPos + distance * rate;
-    }
-    private void OnTriggerEnter2D(Collider2D collision) {
-        //Debug.Log("Collision!!!!");
-        /*
-        if(collision.tag == "Teleport") {
-            this.transform.position = MapController.map.TeleportPoint[collision.gameObject];
-        }*/
-        switch(collision.tag) {
-            case "Teleport":
-                this.transform.position = MapController.map.TeleportPoint[collision.gameObject];
-                break;
-            /*
-            case "Bait":
-                if(PointManager.baites == -1) PointManager.baites = 0;
-                PointManager.baites++;
-                whichSound = !whichSound;
-                if(whichSound)
-                    source.clip = bait0;
-                else
-                    source.clip = bait1;
-                source.Play();
-                Destroy(collision.gameObject);
-                break;
-            case "PowerBait":
-                if(PointManager.baites == -1) PointManager.baites = 0;
-                PointManager.baites++;
-                PointManager.startTime = Time.timeSinceLevelLoad;
-                PointManager.hasPower = true;
-                Destroy(collision.gameObject);
-                break;
-            */
-        }
-    }
     public void PacBaitAt(int x, int y) {
         var paced_object = FindBaitObjectByCoordinate(x, y);
         switch(paced_object.Item1) {
@@ -206,22 +162,4 @@ public class PacmanController: MonoBehaviour
         Debug.Log(px + " : " + py + " in " + Map.DestroyList.Count());
         return Map.DestroyList[((int)px ,(int)py )];
     }
-
-    /*
-    void CheckStatus() {
-        status[Vector2.up.ToString ()] = !Physics2D.Raycast (transform.position + transform.up * rad, transform.up, 0.5f);
-        status[Vector2.right.ToString ()] = !Physics2D.Raycast (transform.position - transform.up * (rad - delta * gap) + transform.right * (rad - delta), transform.right, 0.5f) &&
-            !Physics2D.Raycast (transform.position + transform.up * (rad - delta * gap) + transform.right * (rad - delta), transform.right, 0.5f);
-        status[Vector2.down.ToString ()] = !Physics2D.Raycast (transform.position - transform.up * rad, -transform.up, 0.5f);
-        status[Vector2.left.ToString ()] = !Physics2D.Raycast (transform.position - transform.up * (rad - delta * gap) - transform.right * (rad - delta), -transform.right, 0.5f) &&
-            !Physics2D.Raycast (transform.position + transform.up * (rad - delta * gap) - transform.right * (rad - delta), -transform.right, 0.5f);
-
-        Debug.DrawRay (transform.position + transform.up * rad, transform.up * rad);
-        Debug.DrawRay (transform.position - transform.up * (rad - delta * gap) + transform.right * (rad - delta), transform.right * 0.5f, Color.blue);
-        Debug.DrawRay (transform.position + transform.up * (rad - delta * gap) + transform.right * (rad - delta), transform.right * 0.5f, Color.blue);
-        Debug.DrawRay (transform.position - transform.up * rad, -transform.up * rad, Color.red);
-        Debug.DrawRay (transform.position - transform.up * (rad - delta * gap) - transform.right * (rad - delta), -transform.right * 0.5f, Color.yellow);
-        Debug.DrawRay (transform.position + transform.up * (rad - delta * gap) - transform.right * (rad - delta), -transform.right * 0.5f, Color.yellow);
-    }*/
-
 }
