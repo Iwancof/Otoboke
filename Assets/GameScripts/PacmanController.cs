@@ -159,6 +159,7 @@ public class PacmanController: MonoBehaviour
                 PointManager.baites++;
                 PointManager.startTime = Time.timeSinceLevelLoad;
                 PointManager.hasPower = true;
+                Debug.unityLogger.Log("Server", "pac");
                 Destroy(paced_object.Item2);
                 break;
         }
