@@ -15,6 +15,7 @@ public class Map {
     public int Width { get; private set; }
     public Dictionary<GameObject,Vector3> TeleportPoint = new Dictionary<GameObject, Vector3>();
     static public Dictionary<(int x, int y), (MapChip, GameObject)> DestroyList = new Dictionary<(int x, int y), (MapChip, GameObject)>();
+    public static bool finishedDrawing = false;
 
 
 
@@ -197,6 +198,8 @@ public class Map {
             Point1 + new Vector3(size, 0, 0)
             );
         //}
+
+        finishedDrawing = true;
     }
 
     public static Map CreateByString(string map_data) {
