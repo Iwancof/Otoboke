@@ -10,7 +10,7 @@ public class PointManager : MonoBehaviour
     public static bool hasPower = false;
     public static float startTime;
     float duration, diff;
-    public static int numofBite = 0;
+    public static int numOfBite = 0;
     public static bool defeat = false;
     Image img;
     Slider slider;
@@ -19,7 +19,7 @@ public class PointManager : MonoBehaviour
     {
         duration = 10;
         defeat = false;
-        numofBite = 0;
+        numOfBite = 0;
         baites = -1;
         slider = GameObject.Find("Canvas/Slider").GetComponent<Slider>();
         img = GameObject.Find("Canvas/Slider/FillArea/Fill").GetComponent<Image>();
@@ -35,12 +35,12 @@ public class PointManager : MonoBehaviour
                 hasPower = false;
             }
         }        
-        if(numofBite <= baites) { // パックマンが餌を食べ尽くした
+        if(numOfBite <= baites) { // パックマンが餌を食べ尽くした
             // ゲームオーバー処理
             defeat = true;
         }
-        if (numofBite > 0) {
-            slider.value = (float)(numofBite - baites) / numofBite;
+        if (numOfBite > 0) {
+            slider.value = (float)(numOfBite - baites) / numOfBite;
         }
         if(prevBites != baites) {
             // r -> value 1～0.5 の間0から255まで上がる

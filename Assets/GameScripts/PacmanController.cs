@@ -77,16 +77,16 @@ public class PacmanController: MonoBehaviour
 
     public void PacBaitAt(int x, int y) {
         var paced_object = FindBaitObjectByCoordinate(x, y);
-        Logger.Log("GameSystem", $"pac some {paced_object.Item1}");
         switch(paced_object.Item1) {
             case MapChip.Bait:
                 if (PointManager.baites == -1) PointManager.baites = 0;
                 PointManager.baites++;
                 whichSound = !whichSound;
-                if (whichSound)
+                if (whichSound) {
                     source.clip = bait0;
-                else
+                } else {
                     source.clip = bait1;
+                }
                 source.Play();
                 Destroy(paced_object.Item2);
                 break;
@@ -95,27 +95,12 @@ public class PacmanController: MonoBehaviour
                 PointManager.baites++;
                 PointManager.startTime = Time.timeSinceLevelLoad;
                 PointManager.hasPower = true;
-                Logger.Log("GameSystem", "pac power bait");
                 Destroy(paced_object.Item2);
                 break;
         }
     }
 
     public (MapChip, GameObject) FindBaitObjectByCoordinate(int px, int py) {
-        /*
-        var ret_obj = Baits
-            .Select((e, i) => (e, i))
-            .Select(x =>
-                (x, Vector3.Distance(
-                    x.e.transform.position,
-                    new Vector3(px * MapController.size, py * MapController.size, 0))
-                ))
-            .OrderBy(x => x.Item2);
-
-        var ret = ret_obj.First();
-        Baits.RemoveAt(ret.x.i);
-        return ret.x.e;
-        */
         Logger.Log(Logger.GameSystemPacTag, px + " : " + py + " in " + Map.DestroyList.Count());
         return Map.DestroyList[((int)px ,(int)py )];
     }

@@ -8,6 +8,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
+public delegate void MainThreadTransfer();
+
 public class MapController : MonoBehaviour {
 
     public static NetworksManager nm;
@@ -36,6 +38,8 @@ public class MapController : MonoBehaviour {
         GameStarted,
     };
     public static SystemStatus systemStatus; // いろいろなところで書き換わるので注意。
+
+    Queue<MainThreadTransfer> mainThreadTransfers = new Queue<MainThreadTransfer>();
 
     GameObject test_object;
 
@@ -70,13 +74,8 @@ public class MapController : MonoBehaviour {
 
     LoopTimer communicateCoordinate = new LoopTimer(0.08f);
     LoopTimer update_bait_by_server = new LoopTimer(0.08f);
-    LoopTimer test_player_defeat = new LoopTimer(15f);
-    LoopTimer print_player_coordinate = new LoopTimer(0.1f);
-    LoopTimer test_print_queue = new LoopTimer(0.2f);
 
     FirstTimeClass toServerEndEffect = new FirstTimeClass();
-
-    string tmp = "";
 
     // Update is called once per frame
     void Update() {
@@ -93,15 +92,18 @@ public class MapController : MonoBehaviour {
 
             void tmp_func(string str) {
                 nm.ProcessReservation(tmp_func, "Get coordinate LoopCast()A");
-                tmp = str + '\n' + nm.ReadBuffer.Count + " : " + nm.ProcessMM1.Count;
 
                 var get_data = str.TrimTo(';');
                 if (get_data.Tag == "PLAYER") {
                     PlayerTemporaryCoordinate = JsonUtility.FromJson<ClientCoordinateForJson>(get_data.Data);
-                    canPlayerUpdateCoordinate = true;
+                    doInMainThread(new MainThreadTransfer(() => {
+                        UpdatePlayerInfo(PlayerTemporaryCoordinate);
+                    }));
                 } else if (get_data.Tag == "PACMAN") {
                     PacmanTemporaryCoordinate = JsonUtility.FromJson<PacmanCoordinateForJson>(get_data.Data);
-                    canPacmanUpdateCoordinate = true;
+                    doInMainThread(new MainThreadTransfer(() => {
+                        UpdatePacmanInfo(PacmanTemporaryCoordinate);
+                    }));
                 } else if (get_data.Tag == "PACCOL") {
                     PacedCoordinateForJson paced_crd = JsonUtility.FromJson<PacedCoordinateForJson>(get_data.Data);
                     foreach (var e in paced_crd.Coordinate) {
@@ -127,7 +129,7 @@ public class MapController : MonoBehaviour {
             }
             case SystemStatus.GameStarted: {
                 if(toServerEndEffect) {
-                    nm.Write("END_EFFECT");
+                    nm.WriteLine("END_EFFECT");
                 }
 
                 LoopTimer.timeUpdate(Time.deltaTime);
@@ -139,60 +141,30 @@ public class MapController : MonoBehaviour {
             }
         }
 
-        if (canPlayerUpdateCoordinate) {
-            UpdatePlayerInfo(PlayerTemporaryCoordinate);
-            canPlayerUpdateCoordinate = false;
-        }
-        if (canPacmanUpdateCoordinate) {
-            UpdatePacmanInfo(PacmanTemporaryCoordinate);
-            canPacmanUpdateCoordinate = false;
+        while(mainThreadTransfers.Count() != 0) {
+            mainThreadTransfers.Dequeue()();
         }
 
         if (update_bait_by_server.reached) {
+            /* これが呼ばれるたびに、食べられた餌の処理が入る。 */
             foreach(var e in PacedTemporaryCoordinates) {
-                Logger.Log(Logger.CommunicationShowTag, $"({e.x}, {e.y})");
+                Logger.Log(Logger.GameSystemPacTag, $"({e.x}, {e.y})");
                 pacmanController.PacBaitAt(e.x, e.y);
             }
             PacedTemporaryCoordinates = new List<(int x, int y)>();
         }
 
-
-        if (test_print_queue.reached) {
-            //nm.QueueLog();
-        }
-
         if (isMapDeployed && communicateCoordinate.reached) {
+            /* サーバにプレイヤーの情報を送信 */
             nm.WriteLine(
                 $"{player.transform.position.x}," +
                 $"{player.transform.position.y}," +
                 $"{player.transform.position.z}");
         }
+    }
 
-        if (isMapDeployed) {
-            textobj.text = tmp;
-        }
-
-        if (test_player_defeat.reached) {
-            Logger.Log(Logger.GameSystemPlayerTag, "Defeat");
-        }
-
-        if (print_player_coordinate.reached) {
-            /*
-            test_object.transform.position = new Vector3(
-                (int)((player.transform.position.x - size / 2 + 1) / size) * size,
-                (int)((player.transform.position.y - size / 2 + 1) / size) * size,
-                (int)((player.transform.position.z - size / 2 + 1) / size) * size
-                );
-            */
-            /*
-            
-        ($"" +
-                $"{(int)((player.transform.position.x - size / 2 + 1) / size)}," +
-                $"{(int)((player.transform.position.y - size / 2 + 1) / size)}," +
-                $"{(int)((player.transform.position.z - size / 2 + 1) / size)}"
-                );
-            */
-        }
+    public void doInMainThread(MainThreadTransfer mtt) {
+        mainThreadTransfers.Enqueue(mtt);
     }
 
     public void AddPlayer() {
@@ -209,18 +181,7 @@ public class MapController : MonoBehaviour {
         foreach (var t in cc.Coordinate.Select((e, i) => (e, i))) {
             if (nm.client_id == t.i) continue;
             players[t.i].transform.position = t.e.ToVector();
-
-            //Debug.Log(Players[t.i].transform.position.ToString());
-
-            //GameObject.Find($"client{t.i}(Clone)").transform.position = t.e.ToVector();
-            //Debug.Log(t.e.ToString());
         }
-        /*
-        var time = 0.2f; // 目的の座標まで移動するのに掛ける時間
-        pacmanController.targetPos = cc.Pacman.ToVector();
-        pacmanController.time = time;
-        */
-        //Debug.Log("Pacman:" + cc.Pacman.ToString());
     }
     public void UpdatePacmanInfo(PacmanCoordinateForJson cc) {
         pacmanController.targetPos = cc.Pacman.ToVector() * size;
