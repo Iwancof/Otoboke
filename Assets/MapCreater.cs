@@ -165,8 +165,7 @@ public class Map {
                         obj = MonoBehaviour.Instantiate(powerBait_object, pos, Quaternion.identity);
                         obj.name = $"PowerBait_[{x},{y}]";
                         obj.transform.parent = map.transform;
-                        //Debug.Log("Add power bait");
-                        Debug.unityLogger.Log("GameSystem", "Add power bait.");
+                        Logger.Log("GameSystem", "add power bait");
                         DestroyList.Add((x, y - 1), (MapChip.PowerBait, obj));
                         break;
                 }
