@@ -87,8 +87,11 @@ public class NetworksManager {
     }
 
     public void WriteLine(string str) {
-        InitCheck();
         str += '\n';
+        Write(str);
+    }
+    public void Write(string str) {
+        InitCheck();
         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(str);
         stream.Write(bytes, 0, bytes.Length);
     }

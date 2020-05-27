@@ -9,7 +9,7 @@ public class AudioController : MonoBehaviour
     AudioClip opening;
     [SerializeField]
     AudioClip bgm;
-    bool firsttime;
+    FirstTimeClass openingFt = new FirstTimeClass(), bgmFt = new FirstTimeClass();
     enum BGM {
         opening,
         bgm
@@ -18,8 +18,6 @@ public class AudioController : MonoBehaviour
     void Start()
     {
         source = GetComponent<AudioSource>();
-        firsttime = true;
-        Time.timeScale = 0f;
         source.clip = opening;
         bgmStatus = BGM.opening;
     }
@@ -28,28 +26,37 @@ public class AudioController : MonoBehaviour
     {
         switch(bgmStatus) {
             case BGM.bgm: {
-                if(firsttime) {
+                if(bgmFt) {
                     source.Play();
-                    firsttime = false;
                 }
                 break;
             }
             case BGM.opening: {
-                if(Map.finishedDrawing) {
-                    if(firsttime) {
-                        source.Play();
-                        firsttime = false;
-                    } else if(!source.isPlaying) {
-                        Time.timeScale = 1f;
-                        source.Stop();
-                        source.loop = true;
-                        source.clip = bgm;
-                        bgmStatus = BGM.bgm;
-                        firsttime = true;
-                    }
+                if (!(MapController.systemStatus == MapController.SystemStatus.WaitPlayOpening)) {
+                    break;
                 }
+                if(source.isPlaying) {
+                    break; /* 再生中なら帰る */
+                }
+
+                if (openingFt) {
+                    source.Play();
+                    break;
+                }
+
+                /* ゲームのステータスをすすめる */
+                MapController.systemStatus = MapController.SystemStatus.GameStarted;
+
+                /* sourceをbgm用に変更 */
+                source.Stop();
+                source.clip = bgm;
+                source.loop = true;
+                bgmStatus = BGM.bgm;
+
                 break;
             }
         }
     }
 }
+
+

@@ -30,27 +30,39 @@ public class MapController : MonoBehaviour {
     private Color[] Colors = { Color.red, Color.green, Color.blue };
     public static float size = 1.05f; //this will fix
 
-    GameObject test_object;
+    public enum SystemStatus {
+        WaitServerCommunication,
+        WaitPlayOpening,
+        GameStarted,
+    };
+    public static SystemStatus systemStatus; // いろいろなところで書き換わるので注意。
 
+    GameObject test_object;
 
     // Start is called before the first frame update
     void Start() {
+        /* ロガーの有効化 */
         Logger.enable(Logger.GameSystemPacTag);
         Logger.enable(Logger.CommunicationDebugTag);
+
+        systemStatus = SystemStatus.WaitServerCommunication;
 
         player = GameObject.Find("Player");
         test_object = GameObject.Find("test_object");
         pacmanController = GameObject.Find("Pacman").GetComponent<PacmanController>();
 
+        /* マップ情報取得 */
         nm.ProcessReservation((string str) => {
             map = Map.CreateByString(str);
             isMapReceived = true;
         }, "Map");
 
+        /* サーバとの通信の初期化 */
         nm.ProcessReservation((string str) => {
             playerCount = JsonUtility.FromJson<ForCountPlayerClass>(str).value;
             Logger.Log(Logger.CommunicationShowTag, "Count : " + playerCount);
             canPlayerAdd = true;
+            systemStatus = SystemStatus.WaitPlayOpening;
         }, "CountPlayer");
 
         textobj = GameObject.Find("LogText").GetComponent<Text>();
@@ -62,25 +74,17 @@ public class MapController : MonoBehaviour {
     LoopTimer print_player_coordinate = new LoopTimer(0.1f);
     LoopTimer test_print_queue = new LoopTimer(0.2f);
 
+    FirstTimeClass toServerEndEffect = new FirstTimeClass();
+
     string tmp = "";
 
     // Update is called once per frame
     void Update() {
-        LoopTimer.timeUpdate(Time.deltaTime);
 
         if (canPlayerAdd) {
             AddPlayer();
             canPlayerAdd = false;
         }
-        if (canPlayerUpdateCoordinate) {
-            UpdatePlayerInfo(PlayerTemporaryCoordinate);
-            canPlayerUpdateCoordinate = false;
-        }
-        if(canPacmanUpdateCoordinate) {
-            UpdatePacmanInfo(PacmanTemporaryCoordinate);
-            canPacmanUpdateCoordinate = false;
-        }
-
 
         if (!isMapDeployed && isMapReceived) {
             map.OverwriteTile();
@@ -109,10 +113,42 @@ public class MapController : MonoBehaviour {
 
             }
             nm.ProcessReservation(tmp_func, "Get coordinate LoopCast()B");
+        }
+        switch (systemStatus) {
+            case SystemStatus.WaitServerCommunication: {
+                // waiting...
+                // nm.ProcessReservertionのCountPlayerで書き換わる。
+                return;
+            }
+            case SystemStatus.WaitPlayOpening: {
+                // waiting...
+                // AutoControllerのUpdate内で書き換わる。
+                return;
+            }
+            case SystemStatus.GameStarted: {
+                if(toServerEndEffect) {
+                    nm.Write("END_EFFECT");
+                }
 
+                LoopTimer.timeUpdate(Time.deltaTime);
+                break;
+            }
+            default: {
+                Debug.LogError("Invalid SystemStatus");
+                break;
+            }
         }
 
-        if(update_bait_by_server.reached) {
+        if (canPlayerUpdateCoordinate) {
+            UpdatePlayerInfo(PlayerTemporaryCoordinate);
+            canPlayerUpdateCoordinate = false;
+        }
+        if (canPacmanUpdateCoordinate) {
+            UpdatePacmanInfo(PacmanTemporaryCoordinate);
+            canPacmanUpdateCoordinate = false;
+        }
+
+        if (update_bait_by_server.reached) {
             foreach(var e in PacedTemporaryCoordinates) {
                 Logger.Log(Logger.CommunicationShowTag, $"({e.x}, {e.y})");
                 pacmanController.PacBaitAt(e.x, e.y);
@@ -149,7 +185,8 @@ public class MapController : MonoBehaviour {
                 );
             */
             /*
-            Debug.Log($"" +
+            
+        ($"" +
                 $"{(int)((player.transform.position.x - size / 2 + 1) / size)}," +
                 $"{(int)((player.transform.position.y - size / 2 + 1) / size)}," +
                 $"{(int)((player.transform.position.z - size / 2 + 1) / size)}"
@@ -198,6 +235,17 @@ public class MapController : MonoBehaviour {
         tokenSource.Cancel();
     }
 }
+
+class FirstTimeClass {
+    bool b = true;
+    public FirstTimeClass() { }
+    public static implicit operator bool(FirstTimeClass f) {
+        bool ret = f.b;
+        f.b = false;
+        return ret;
+    }
+}
+
 
 public class LoopTimer {
     private static List<LoopTimer> objects = new List<LoopTimer>();
