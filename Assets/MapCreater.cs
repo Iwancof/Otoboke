@@ -160,17 +160,13 @@ public class Map {
                         obj = MonoBehaviour.Instantiate(bait_object, pos, Quaternion.identity);
                         obj.name = $"Bait_[{x},{y}]";
                         obj.transform.parent = map.transform;
-                        /*
-                        if(Vector3.Distance(pos, new Vector3(12.6f, 11.55f, 0)) < 0.1f) {
-                            Debug.Log($"bait at {x}, {y}");
-                        }
-                        */
                         DestroyList.Add((x, y - 1), (MapChip.Bait, obj));
                         break;
                     case MapChip.PowerBait:
                         obj = MonoBehaviour.Instantiate(powerBait_object, pos, Quaternion.identity);
                         obj.name = $"PowerBait_[{x},{y}]";
                         obj.transform.parent = map.transform;
+                        Logger.Log("GameSystem", "add power bait");
                         DestroyList.Add((x, y - 1), (MapChip.PowerBait, obj));
                         break;
                 }

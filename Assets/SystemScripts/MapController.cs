@@ -32,8 +32,12 @@ public class MapController : MonoBehaviour {
 
     GameObject test_object;
 
+
     // Start is called before the first frame update
     void Start() {
+        Logger.enable(Logger.GameSystemPacTag);
+        Logger.enable(Logger.CommunicationDebugTag);
+
         player = GameObject.Find("Player");
         test_object = GameObject.Find("test_object");
         pacmanController = GameObject.Find("Pacman").GetComponent<PacmanController>();
@@ -41,12 +45,11 @@ public class MapController : MonoBehaviour {
         nm.ProcessReservation((string str) => {
             map = Map.CreateByString(str);
             isMapReceived = true;
-            //nm.WriteLine("MAP_RECEIVED|");
         }, "Map");
 
         nm.ProcessReservation((string str) => {
             playerCount = JsonUtility.FromJson<ForCountPlayerClass>(str).value;
-            Debug.Log("Count : " + playerCount);
+            Logger.Log(Logger.CommunicationShowTag, "Count : " + playerCount);
             canPlayerAdd = true;
         }, "CountPlayer");
 
@@ -111,8 +114,7 @@ public class MapController : MonoBehaviour {
 
         if(update_bait_by_server.reached) {
             foreach(var e in PacedTemporaryCoordinates) {
-                Debug.Log($"({e.x}, {e.y})");
-                //Debug.Log("Destroy ... " + map.DestroyList[(e.x, e.y)]);
+                Logger.Log(Logger.CommunicationShowTag, $"({e.x}, {e.y})");
                 pacmanController.PacBaitAt(e.x, e.y);
             }
             PacedTemporaryCoordinates = new List<(int x, int y)>();
@@ -135,7 +137,7 @@ public class MapController : MonoBehaviour {
         }
 
         if (test_player_defeat.reached) {
-            Debug.Log("Defeat");
+            Logger.Log(Logger.GameSystemPlayerTag, "Defeat");
         }
 
         if (print_player_coordinate.reached) {

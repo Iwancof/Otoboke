@@ -35,7 +35,7 @@ public class NetworksManager {
     }
 
     public NetworksManager() : this("localhost", 8080) {
-        Debug.Log("[Warning]Selected dafalt server(localhost:8080).");
+        Logger.Log(Logger.GeneralSystemTag, "Selected dafalt server(localhost:8080).");
     }
     [System.Serializable]
     class ForIDCounterClass { public int counter; };
@@ -68,7 +68,7 @@ public class NetworksManager {
 
                     ProcessReservation((string str) => {
                         client_id = JsonUtility.FromJson<ForIDCounterClass>(str).counter;
-                        Debug.Log("id = " + client_id);
+                        Logger.Log(Logger.CommunicationShowTag, "id = " + client_id);
                     }, "Json");
 
                     ProcessReservation((string str) => {
@@ -94,7 +94,7 @@ public class NetworksManager {
     }
 
     public void QueueLog() {
-        Debug.Log($"Process:{ProcessMM1.Count},Data:{ReadBuffer.Count}");
+        Logger.Log(Logger.CommunicationDebugTag, $"Process:{ProcessMM1.Count},Data:{ReadBuffer.Count}");
     }
 
     private async void StartProcessDequeue(CancellationToken token) {
@@ -106,7 +106,7 @@ public class NetworksManager {
                         if (ProcessMM1.Count >= 10) Debug.LogError("Process reservation limit reached. name : " + ProcessMM1.Dequeue().Key);
                         if (ReadBuffer.Count >= 10) Debug.LogError("ReadBuffer limit reached. data : " + ReadBuffer.Dequeue());
                         if (token.IsCancellationRequested) {
-                            Debug.Log("Cancel in StartProcessDequeue");
+                            Logger.Log(Logger.CommunicationDebugTag, "Cancel in StartProcessDequeue");
                             return;
                         }
                     }
@@ -136,7 +136,7 @@ public class NetworksManager {
             while (true) {
                 c = (char)reader.Read();
                 if (token.IsCancellationRequested) {
-                    Debug.Log("Cancel in StartReadingNetwork");
+                    Logger.Log(Logger.CommunicationDebugTag, "Cancel in StartReadingNetwork");
                     return;
                 }
 

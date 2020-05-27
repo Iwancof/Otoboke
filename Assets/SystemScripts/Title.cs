@@ -61,7 +61,7 @@ public class Title : MonoBehaviour {
                 statusObject.text = "Connecting....";
 
                 //MapController.nm = new NetworksManager("2400:4051:99c2:5800:9978:6c9:2c0c:8520", 5522);
-                MapController.nm = new NetworksManager("localhost", 12345);
+                MapController.nm = new NetworksManager("localhost", 5522);
                 //MapController.nm = new NetworksManager("2400:4051:99c2:5800:2cad:351d:e2d8:fc07", 5522);
                 MapController.nm.Connect();
                 isConnectingServer = true;

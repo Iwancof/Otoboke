@@ -46,7 +46,6 @@ public class PointManager : MonoBehaviour
             // r -> value 1～0.5 の間0から255まで上がる
             // g -> value 0.5～0 の間255から0まで下がる
             img.color = new Color(slider.value >= 0.5 ? (float)(1-(slider.value-0.5) * 2) : 1, slider.value < 0.5 ? (float)(slider.value * 2) : 1, 0);
-            Debug.Log(img.color);
         }
         prevBites = baites;
 
