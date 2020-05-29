@@ -19,7 +19,8 @@ public class MapController : MonoBehaviour {
         isMapDeployed = false,
         canPlayerAdd = false,
         canPlayerUpdateCoordinate = false,
-        canPacmanUpdateCoordinate = false;
+        canPacmanUpdateCoordinate = false,
+        GameReady = false;
     GameObject player; //To get player coordinate
     PacmanController pacmanController;
     int playerCount;
@@ -35,6 +36,7 @@ public class MapController : MonoBehaviour {
     public enum SystemStatus {
         WaitServerCommunication,
         WaitPlayOpening,
+        WaitOtherPlayer,
         GameStarted,
     };
     public static SystemStatus systemStatus; // いろいろなところで書き換わるので注意。
@@ -74,6 +76,13 @@ public class MapController : MonoBehaviour {
 
             systemStatus = SystemStatus.WaitPlayOpening;
         }, "CountPlayer");
+
+        nm.ProcessReservation((string str) => {
+            Logger.Log(Logger.CommunicationDebugTag, str);
+            if (str == "GameReady") {
+                GameReady = true;
+            }
+        }, "WaitGameReady");
 
         textobj = GameObject.Find("LogText").GetComponent<Text>();
     }
@@ -128,7 +137,7 @@ public class MapController : MonoBehaviour {
         switch (systemStatus) {
             case SystemStatus.WaitServerCommunication: {
                 /* waiting... */
-                /* nm.ProcessReservertionのCountPlayerで書き換わる。
+                /* nm.ProcessReservertionのCountPlayerで書き換わる。 */
                 return;
             }
             case SystemStatus.WaitPlayOpening: {
@@ -136,11 +145,16 @@ public class MapController : MonoBehaviour {
                 /* AutoControllerのUpdate内で書き換わる。 */
                 return;
             }
-            case SystemStatus.GameStarted: {
-                if(toServerEndEffect) {
+            case SystemStatus.WaitOtherPlayer: {
+                if (toServerEndEffect) {
                     nm.WriteLine("END_EFFECT");
                 }
-
+                if (GameReady) {
+                    systemStatus = SystemStatus.GameStarted;
+                }
+                return;
+            }
+            case SystemStatus.GameStarted: {
                 LoopTimer.timeUpdate(Time.deltaTime);
                 break;
             }

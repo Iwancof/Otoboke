@@ -45,7 +45,7 @@ public class AudioController : MonoBehaviour
                 }
 
                 /* ゲームのステータスをすすめる */
-                MapController.systemStatus = MapController.SystemStatus.GameStarted;
+                MapController.systemStatus = MapController.SystemStatus.WaitOtherPlayer;
 
                 /* sourceをbgm用に変更 */
                 source.Stop();
