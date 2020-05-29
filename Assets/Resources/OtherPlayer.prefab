@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1837978729}
   - component: {fileID: 1837978730}
   m_Layer: 0
-  m_Name: Player
+  m_Name: OtherPlayer
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -78,7 +78,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3430777003400415461}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 870f56a978793a4468e388190d70ef12, type: 3}
   m_Name: 

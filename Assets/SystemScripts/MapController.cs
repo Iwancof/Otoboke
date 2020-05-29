@@ -46,7 +46,7 @@ public class MapController : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
         /* ロガーの有効化 */
-        Logger.enable(Logger.GameSystemPacTag);
+        Logger.enable(Logger.GameSystemProcTag);
         Logger.enable(Logger.CommunicationDebugTag);
 
         systemStatus = SystemStatus.WaitServerCommunication;
@@ -65,7 +65,13 @@ public class MapController : MonoBehaviour {
         nm.ProcessReservation((string str) => {
             playerCount = JsonUtility.FromJson<ForCountPlayerClass>(str).value;
             Logger.Log(Logger.CommunicationShowTag, "Count : " + playerCount);
-            canPlayerAdd = true;
+            Logger.Log(Logger.CommunicationDebugTag, "Count : " + playerCount);
+            //canPlayerAdd = true;
+            doInMainThread(new MainThreadTransfer(() => {
+                Logger.Log(Logger.GameSystemProcTag, "Call add player" );
+                AddPlayer();
+            }));
+
             systemStatus = SystemStatus.WaitPlayOpening;
         }, "CountPlayer");
 
@@ -80,10 +86,13 @@ public class MapController : MonoBehaviour {
     // Update is called once per frame
     void Update() {
 
+        /*
         if (canPlayerAdd) {
+            Logger.Log(Logger.GameSystemProcTag, "Call add player" );
             AddPlayer();
             canPlayerAdd = false;
         }
+        */
 
         if (!isMapDeployed && isMapReceived) {
             map.OverwriteTile();
@@ -119,7 +128,7 @@ public class MapController : MonoBehaviour {
         switch (systemStatus) {
             case SystemStatus.WaitServerCommunication: {
                 /* waiting... */
-                /* nm.ProcessReservertionのCountPlayerで書き換わる。 */
+                /* nm.ProcessReservertionのCountPlayerで書き換わる。
                 return;
             }
             case SystemStatus.WaitPlayOpening: {
@@ -171,9 +180,9 @@ public class MapController : MonoBehaviour {
         players = new Dictionary<int, GameObject>();
         for (int i = 0; i < playerCount; i++) {
             if (i == nm.client_id) continue;
-            var obj = MonoBehaviour.Instantiate((GameObject)Resources.Load("Player"), new Vector3(15, 20, 0), Quaternion.identity);
+            var obj = MonoBehaviour.Instantiate((GameObject)Resources.Load("OtherPlayer"), new Vector3(15, 20, 0), Quaternion.identity);
             obj.name = $"client{i}";
-            obj.GetComponent<SpriteRenderer>().material.color = Colors[i];
+            obj.transform.Find("Anim").GetComponent<SpriteRenderer>().material.color = Colors[i];
             players.Add(i, GameObject.Find($"client{i}"));
         }
     }
