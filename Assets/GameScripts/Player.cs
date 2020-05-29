@@ -47,6 +47,9 @@ public class Player : MonoBehaviour {
     }
 
     void Update () {
+        if (MapController.systemStatus != MapController.SystemStatus.GameStarted) {
+            return;
+        }
         if (!isDead) {
             InputBuffer ();
             CheckStatus ();

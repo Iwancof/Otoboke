@@ -118,13 +118,13 @@ public class MapController : MonoBehaviour {
         }
         switch (systemStatus) {
             case SystemStatus.WaitServerCommunication: {
-                // waiting...
-                // nm.ProcessReservertionのCountPlayerで書き換わる。
+                /* waiting... */
+                /* nm.ProcessReservertionのCountPlayerで書き換わる。 */
                 return;
             }
             case SystemStatus.WaitPlayOpening: {
-                // waiting...
-                // AutoControllerのUpdate内で書き換わる。
+                /* waiting... */
+                /* AutoControllerのUpdate内で書き換わる。 */
                 return;
             }
             case SystemStatus.GameStarted: {

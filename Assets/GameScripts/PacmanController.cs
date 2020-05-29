@@ -27,6 +27,9 @@ public class PacmanController: MonoBehaviour
     bool teleportFlag = false;
     void Update()
     {
+        if(MapController.systemStatus != MapController.SystemStatus.GameStarted) {
+            return;
+        }
         if(targetPos != teleportPoint[0] && targetPos != teleportPoint[1]) {
             transform.position = Vector3.SmoothDamp(transform.position, targetPos, ref speed, time);
             teleportFlag = true;
