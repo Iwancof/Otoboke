@@ -87,7 +87,7 @@ public class MapController : MonoBehaviour {
         textobj = GameObject.Find("LogText").GetComponent<Text>();
     }
 
-    LoopTimer communicateCoordinate = new LoopTimer(0.08f);
+    LoopTimer communicateCoordinate = new LoopTimer(0.2f);
     LoopTimer update_bait_by_server = new LoopTimer(0.08f);
 
     FirstTimeClass toServerEndEffect = new FirstTimeClass();
@@ -179,12 +179,14 @@ public class MapController : MonoBehaviour {
 
         if (isMapDeployed && communicateCoordinate.reached) {
             /* サーバにプレイヤーの情報を送信 */
+            Debug.Log(count++);
             nm.WriteLine(
                 $"{player.transform.position.x}," +
                 $"{player.transform.position.y}," +
                 $"{player.transform.position.z}");
         }
     }
+    int count = 0;
 
     public void doInMainThread(MainThreadTransfer mtt) {
         mainThreadTransfers.Enqueue(mtt);
