@@ -87,10 +87,11 @@ public class MapController : MonoBehaviour {
         textobj = GameObject.Find("LogText").GetComponent<Text>();
     }
 
-    LoopTimer communicateCoordinate = new LoopTimer(0.08f);
+    LoopTimer communicateCoordinate = new LoopTimer(0.2f);
     LoopTimer update_bait_by_server = new LoopTimer(0.08f);
 
     FirstTimeClass toServerEndEffect = new FirstTimeClass();
+    FirstTimeClass communicateCoordinateSetClosure = new FirstTimeClass();
 
     // Update is called once per frame
     void Update() {
@@ -163,6 +164,11 @@ public class MapController : MonoBehaviour {
                 break;
             }
         }
+        /*
+        if(communicateCoordinateSetClosure) {
+            
+        }
+        */
 
         while(mainThreadTransfers.Count() != 0) {
             mainThreadTransfers.Dequeue()();
@@ -185,7 +191,6 @@ public class MapController : MonoBehaviour {
                 $"{player.transform.position.z}");
         }
     }
-
     public void doInMainThread(MainThreadTransfer mtt) {
         mainThreadTransfers.Enqueue(mtt);
     }
