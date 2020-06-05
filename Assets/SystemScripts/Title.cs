@@ -11,6 +11,9 @@ public class Title : MonoBehaviour {
     public float arrowMoveSize = 17;
     private bool isConnectingServer = false;
     public static bool canStartGame = false;
+    public AudioClip selectSound;
+    public AudioClip enterSound;
+    AudioSource source;
 
     // Start is called before the first frame update
     void Start() {
@@ -19,6 +22,7 @@ public class Title : MonoBehaviour {
             new Vector3(11, 15, 0);
         canStartGame = false;
         isConnectingServer = false;
+        source = GetComponent<AudioSource>();
     }
 
     float time = 0f;
@@ -43,8 +47,16 @@ public class Title : MonoBehaviour {
             time = 0f;
         }
 
-        if (Input.GetKey(KeyCode.J)) arrowState++;
-        if (Input.GetKey(KeyCode.K)) arrowState--;
+        if (Input.GetKeyDown(KeyCode.J)) {
+            arrowState++;
+            source.clip = selectSound;
+            source.Play();
+        }
+        if (Input.GetKeyDown(KeyCode.K)) {
+            arrowState--;
+            source.clip = selectSound;
+            source.Play();
+        }
         EnumBoundCheck();
 
         if (Input.GetKey(KeyCode.Return)) {
@@ -65,6 +77,9 @@ public class Title : MonoBehaviour {
                 //MapController.nm = new NetworksManager("2400:4051:99c2:5800:2cad:351d:e2d8:fc07", 5522);
                 MapController.nm.Connect();
                 isConnectingServer = true;
+
+                source.clip = enterSound;
+                source.Play();
 
                 break;
             }
