@@ -27,6 +27,7 @@ public class AudioController : MonoBehaviour
         switch(bgmStatus) {
             case BGM.bgm: {
                 if(bgmFt) {
+                    source.volume = 0.5f;
                     source.Play();
                 }
                 break;

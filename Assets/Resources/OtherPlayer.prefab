@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1837978728}
   - component: {fileID: 1837978729}
   - component: {fileID: 1837978730}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: OtherPlayer
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 3923362345837568119}
   - component: {fileID: 8798381888890162650}
   - component: {fileID: 907532333832870469}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Anim
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -154,7 +154,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 10
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
