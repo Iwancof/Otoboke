@@ -87,7 +87,7 @@ public class MapController : MonoBehaviour {
         textobj = GameObject.Find("LogText").GetComponent<Text>();
     }
 
-    LoopTimer communicateCoordinate = new LoopTimer(0.2f);
+    LoopTimer communicateCoordinate = new LoopTimer(0.05f);
     LoopTimer update_bait_by_server = new LoopTimer(0.08f);
 
     FirstTimeClass toServerEndEffect = new FirstTimeClass();

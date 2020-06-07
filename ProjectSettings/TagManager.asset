@@ -9,6 +9,7 @@ TagManager:
   - Teleport
   - Bait
   - PowerBait
+  - Pacman
   layers:
   - Default
   - TransparentFX
@@ -18,7 +19,7 @@ TagManager:
   - UI
   - 
   - 
-  - 
+  - Player
   - 
   - 
   - 

@@ -32,7 +32,7 @@ int main(void) {
 
     DWORD samplingRate = 44100;
     DWORD bitsize = 16;
-    DWORD msec = 500;
+    DWORD msec = 400;
     DWORD kaisuu = 16;
 
     strncpy(wavHead->RIFF, "RIFF", 4);
@@ -80,7 +80,7 @@ int main(void) {
         float x = 2 * (hz2 - hz1)/2 * M_PI; // 2 * pi * hz
         //float y = 2 * 1/cycle/*hz*/ * M_PI; // 2 * pi * hz, 音の上下する周期
         float y = 2 * 1/(msec/1000.0) * M_PI;
-        s = 0xFFFF * 0.25 * sin(omega * time + x/y * sin(y * time));    // FM変調
+        s = 0xFFFF * 0.10 * sin(omega * time + x/y * sin(y * time));    // FM変調
         out = (short)s;
         wav[i] = out;
     }
