@@ -114,8 +114,10 @@ public class NetworksManager {
                         }
                     }
                     //Debug.Log("Dequeue : " + ReadBuffer.Peek());
-                    ProcessMM1.Dequeue().Value(ReadBuffer.Dequeue());
-                }catch(MapCreateException e) {
+                    string get_data = ReadBuffer.Dequeue();
+                    ProcessMM1.Dequeue().Value(get_data);
+                    //Logger.Log(Logger.CommunicationDebugTag, get_data);
+                } catch(MapCreateException e) {
                     Debug.LogError($"Map data corruption. {e.Message}");
                     return;
                 } catch (Exception e) {

@@ -48,7 +48,7 @@ public class MapController : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
         /* ロガーの有効化 */
-        Logger.enable(Logger.GameSystemProcTag);
+        //Logger.enable(Logger.GameSystemProcTag);
         Logger.enable(Logger.CommunicationDebugTag);
 
         systemStatus = SystemStatus.WaitServerCommunication;
@@ -87,7 +87,7 @@ public class MapController : MonoBehaviour {
         textobj = GameObject.Find("LogText").GetComponent<Text>();
     }
 
-    LoopTimer communicateCoordinate = new LoopTimer(0.2f);
+    LoopTimer communicateCoordinate = new LoopTimer(0.05f);
     LoopTimer update_bait_by_server = new LoopTimer(0.08f);
 
     FirstTimeClass toServerEndEffect = new FirstTimeClass();
@@ -111,6 +111,8 @@ public class MapController : MonoBehaviour {
 
             void tmp_func(string str) {
                 nm.ProcessReservation(tmp_func, "Get coordinate LoopCast()A");
+
+                Logger.Log(Logger.CommunicationDebugTag, str);
 
                 var get_data = str.TrimTo(';');
                 if (get_data.Tag == "PLAYER") {
@@ -164,11 +166,6 @@ public class MapController : MonoBehaviour {
                 break;
             }
         }
-        /*
-        if(communicateCoordinateSetClosure) {
-            
-        }
-        */
 
         while(mainThreadTransfers.Count() != 0) {
             mainThreadTransfers.Dequeue()();
@@ -212,7 +209,8 @@ public class MapController : MonoBehaviour {
         }
     }
     public void UpdatePacmanInfo(PacmanCoordinateForJson cc) {
-        pacmanController.targetPos = cc.Pacman.ToVector() * size;
+        Logger.Log(Logger.CommunicationDebugTag, "Pacman at " + cc.Pacman.ToString());
+        pacmanController.targetPos = cc.Pacman.ToVector();
         pacmanController.time = 0.2f;
     }
 
