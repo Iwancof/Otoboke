@@ -7,6 +7,7 @@ using System;
 public class Title : MonoBehaviour {
     public Text arrowObject, statusObject;
     ArrowState arrowState = ArrowState.JoinToServer;
+    ArrowState prevArrowState = ArrowState.JoinToServer;
     public Vector3 initialArrowCoordinate;
     public float arrowMoveSize = 17;
     private bool isConnectingServer = false;
@@ -58,39 +59,72 @@ public class Title : MonoBehaviour {
             source.Play();
         }
         EnumBoundCheck();
+        string[] str = GetString();
+        str[(int)prevArrowState] = "　" + str[(int)prevArrowState].Remove(0, 1);
+        str[(int)arrowState] = "▶" + str[(int)arrowState].Remove(0, 1);
+        SetString(str);
+        //statusObject.text = arrowState.ToString() + ":" + str.Length;
 
         if (Input.GetKey(KeyCode.Return)) {
             ExecuteCommand(arrowState);
         }
 
 
-        arrowObject.rectTransform.position = initialArrowCoordinate - (int)arrowState * arrowMoveSize * new Vector3(0, -1, 0);
+        //arrowObject.rectTransform.position = initialArrowCoordinate - (int)arrowState * arrowMoveSize * new Vector3(0, -1, 0);
+        prevArrowState = arrowState;
     }
 
     private void ExecuteCommand(ArrowState e) {
+        source.clip = enterSound;
+        source.Play();
         switch(e) {
             case ArrowState.JoinToServer: {
                 statusObject.text = "Connecting....";
 
-                //MapController.nm = new NetworksManager("2400:4051:99c2:5800:9978:6c9:2c0c:8520", 5522);
-                //MapController.nm = new NetworksManager("2400:4051:99c2:5800:11a4:53a7:248:a471", 5522);
-                //MapController.nm = new NetworksManager("2400:4051:99c2:5800:11a4:53a7:248:a471", 5522);
                 MapController.nm = new NetworksManager("2400:4051:99c2:58f0:11a4:53a7:248:a471", 5522);
-                //MapController.nm = new NetworksManager("2400:4051:99c2:5800:2cad:351d:e2d8:fc07", 5522);
+                MapController.nm = new NetworksManager("localhost", 5522);
                 MapController.nm.Connect();
                 isConnectingServer = true;
+                break;
+            }
+            case ArrowState.Selectserver: {
+                
+                break;
+            }
+            case ArrowState.Howtoplay: {
 
-                source.clip = enterSound;
-                source.Play();
-
+                break;
+            }
+            case ArrowState.Exit: {
+                #if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+                #elif UNITY_STANDALONE
+                Application.Quit();
+                #endif
                 break;
             }
         }
     }
 
+    string[] GetString() {
+        return arrowObject.text.Split('\n');
+    }
+
+    void SetString(string[] str) {
+        string res = "";
+        foreach(var tmp in str) {
+            res += tmp + "\n";
+        }
+        res = res.Remove(res.Length - 1);
+        arrowObject.text = res;
+    }
+
     enum ArrowState {
         JoinToServer = 0,
+        Selectserver = 1,
+        Howtoplay = 2,
+        Exit = 3,
     }
     private void EnumBoundCheck() =>
-        arrowState = (ArrowState)Math.Max(0, Math.Min((int)ArrowState.JoinToServer, (int)arrowState));
+        arrowState = (ArrowState)Math.Max(0, Math.Min((int)ArrowState.Exit, (int)arrowState));
 }

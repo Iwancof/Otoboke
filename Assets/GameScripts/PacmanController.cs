@@ -22,6 +22,7 @@ public class PacmanController: MonoBehaviour
     {
         anim = GetComponent<Animator>();
         source = GetComponent<AudioSource>();
+        anim.speed = 0;
     }
 
     bool teleportFlag = false;

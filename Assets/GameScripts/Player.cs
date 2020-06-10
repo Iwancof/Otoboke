@@ -35,6 +35,7 @@ public class Player : MonoBehaviour {
         prev = transform.position;
         animObj = transform.Find ("Anim").gameObject;
         anim = animObj.GetComponent<Animator> ();
+        anim.speed = 0;
         rad = gameObject.GetComponent<CircleCollider2D> ().radius;
         rb = gameObject.GetComponent<Rigidbody2D> ();
         status.Add (Vector2.up.ToString (), false);
