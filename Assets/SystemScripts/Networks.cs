@@ -34,7 +34,7 @@ public class NetworksManager {
         ProcessMM1 = new Queue<KeyValuePair<string, ProcessManager>>();
     }
 
-    public NetworksManager() : this("localhost", 8080) {
+    public NetworksManager() : this("localhost", 5522) {
         Logger.Log(Logger.GeneralSystemTag, "Selected dafalt server(localhost:8080).");
     }
     [System.Serializable]
