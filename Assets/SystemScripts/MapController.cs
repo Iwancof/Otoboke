@@ -39,7 +39,7 @@ public class MapController : MonoBehaviour {
         WaitOtherPlayer,
         GameStarted,
     };
-    public static SystemStatus systemStatus; // いろいろなところで書き換わるので注意。
+    public static SystemStatus systemStatus; // いろいろなところで書き換わるので注意。←ひでぇ設計だなぁ
 
     Queue<MainThreadTransfer> mainThreadTransfers = new Queue<MainThreadTransfer>();
 
@@ -128,8 +128,18 @@ public class MapController : MonoBehaviour {
                     }));
                 } else if (get_data.Tag == "PACCOL") {
                     PacedCoordinateForJson paced_crd = JsonUtility.FromJson<PacedCoordinateForJson>(get_data.Data);
-                    foreach (var e in paced_crd.Coordinate) {
-                        PacedTemporaryCoordinates.Add(((int)e.x, (int)e.y));
+                    PacedTemporaryCoordinates.Add((paced_crd.Coordinate.x, paced_crd.Coordinate.y));
+                    // TODO: PacedTem...の型を二次元量子化座標系に合わせる。
+                } else if (get_data.Tag == "PACSTA") {
+                    Logger.Log(Logger.CommunicationDebugTag, $"Pacman status is {get_data.Data}");
+                    switch (get_data.Data) {
+                        case "Normal": {
+
+                            break;
+                        }
+                        case "Powered": {
+                            break;
+                        }
                     }
                 } else {
                     throw new Exception($"{get_data.Tag} is Invalid tag. ");
@@ -272,6 +282,13 @@ public class CoordinateForJson {
         return $"{x},{y},{z}";
     }
 }
+[System.Serializable]
+public class QuanCoordinateForJson {
+    public int x, y;
+    public override string ToString() {
+        return $"({x}, {y})";
+    }
+}
 
 [System.Serializable]
 public class ClientCoordinateForJson {
@@ -292,7 +309,7 @@ public class PacmanCoordinateForJson {
 
 [System.Serializable]
 public class PacedCoordinateForJson {
-    public CoordinateForJson[] Coordinate;
+    public QuanCoordinateForJson Coordinate;
 }
 
 [System.Serializable]

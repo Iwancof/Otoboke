@@ -81,8 +81,7 @@ public class Title : MonoBehaviour {
             case ArrowState.JoinToServer: {
                 statusObject.text = "Connecting....";
 
-                MapController.nm = new NetworksManager("2400:4051:99c2:58f0:11a4:53a7:248:a471", 5522);
-                MapController.nm = new NetworksManager("localhost", 5522);
+                MapController.nm = new NetworksManager("192.168.1.7", 5522);
                 MapController.nm.Connect();
                 isConnectingServer = true;
                 break;
