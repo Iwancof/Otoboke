@@ -18,11 +18,16 @@ public class PacmanController: MonoBehaviour
 
     public static Vector3[] teleportPoint = new Vector3[2];
 
+    Color normal = new Color(1, 1, 0);
+    Color power = new Color(0, 0, 1);
+    Color col;
+
     void Start()
     {
         anim = GetComponent<Animator>();
         source = GetComponent<AudioSource>();
         anim.speed = 0;
+        col = GetComponent<SpriteRenderer>().color;
     }
 
     bool teleportFlag = false;
@@ -30,6 +35,11 @@ public class PacmanController: MonoBehaviour
     {
         if(MapController.systemStatus != MapController.SystemStatus.GameStarted) {
             return;
+        }
+        if(PointManager.hasPower) {
+            col = power;
+        } else {
+            col = normal;
         }
         if(targetPos != teleportPoint[0] && targetPos != teleportPoint[1]) {
             transform.position = Vector3.SmoothDamp(transform.position, targetPos, ref speed, time);

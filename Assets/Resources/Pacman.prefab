@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300002, guid: d50a0d038eff3a9468d180c5879f32f0, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -115,13 +115,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87a23d0054dbd8b499a12bf3c8c7642c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetPos: {x: 0, y: 0, z: 0}
-  time: 10
-  gap: 3
-  speed: 1
-  delta: 0.001
   bait0: {fileID: 8300000, guid: cd86d5bde4096e249ab5bc4ad51874c4, type: 3}
   bait1: {fileID: 8300000, guid: 72b8b5b17ad1e034d9d5cf9c8515189b, type: 3}
+  Baits: []
+  time: 10
+  targetPos: {x: 0, y: 0, z: 0}
 --- !u!58 &8606032090907975545
 CircleCollider2D:
   m_ObjectHideFlags: 0

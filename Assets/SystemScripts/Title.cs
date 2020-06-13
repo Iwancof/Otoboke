@@ -8,6 +8,8 @@ public class Title : MonoBehaviour {
     public Text arrowObject, statusObject;
     ArrowState arrowState = ArrowState.JoinToServer;
     ArrowState prevArrowState = ArrowState.JoinToServer;
+    PageState pageState = PageState.MainMenu;
+    PageState prevPageState = PageState.MainMenu;
     public Vector3 initialArrowCoordinate;
     public float arrowMoveSize = 17;
     private bool isConnectingServer = false;
@@ -16,8 +18,15 @@ public class Title : MonoBehaviour {
     public AudioClip enterSound;
     AudioSource source;
 
+    [SerializeField]
+    GameObject mainMenu, howToPlay;
+
+    string ip = "192.168.1.7";
+    int port = 5522;
+
     // Start is called before the first frame update
     void Start() {
+        ip = "localhost";
         initialArrowCoordinate = 
             GameObject.Find("Canvas").transform.position +
             new Vector3(11, 15, 0);
@@ -48,30 +57,48 @@ public class Title : MonoBehaviour {
             time = 0f;
         }
 
-        if (Input.GetKeyDown(KeyCode.J)) {
-            arrowState++;
-            source.clip = selectSound;
-            source.Play();
-        }
-        if (Input.GetKeyDown(KeyCode.K)) {
-            arrowState--;
-            source.clip = selectSound;
-            source.Play();
-        }
-        EnumBoundCheck();
-        string[] str = GetString();
-        str[(int)prevArrowState] = "　" + str[(int)prevArrowState].Remove(0, 1);
-        str[(int)arrowState] = "▶" + str[(int)arrowState].Remove(0, 1);
-        SetString(str);
-        //statusObject.text = arrowState.ToString() + ":" + str.Length;
+        switch(pageState) {
+            case PageState.MainMenu: {
+                mainMenu.SetActive(true);
+                howToPlay.SetActive(false);
+                if (Input.GetKeyDown(KeyCode.J) || Input.GetKeyDown(KeyCode.DownArrow)) {
+                    arrowState++;
+                    source.clip = selectSound;
+                    source.Play();
+                }
+                if (Input.GetKeyDown(KeyCode.K) || Input.GetKeyDown(KeyCode.UpArrow)) {
+                    arrowState--;
+                    source.clip = selectSound;
+                    source.Play();
+                }
+                EnumBoundCheck();
+                string[] str = GetString();
+                str[(int)prevArrowState] = "　" + str[(int)prevArrowState].Remove(0, 1);
+                str[(int)arrowState] = "▶" + str[(int)arrowState].Remove(0, 1);
+                SetString(str);
+                //statusObject.text = arrowState.ToString() + ":" + str.Length;
 
-        if (Input.GetKey(KeyCode.Return)) {
-            ExecuteCommand(arrowState);
-        }
+                if (Input.GetKeyDown(KeyCode.Return)) {
+                    ExecuteCommand(arrowState);
+                }
+                prevArrowState = arrowState;
+                break;
+            }
 
+            case PageState.HowToPlay: {
+                mainMenu.SetActive(false);
+                howToPlay.SetActive(true);
+                if(Input.GetKeyDown(KeyCode.Return)) {
+                    source.clip = enterSound;
+                    source.Play();
+                    pageState = PageState.MainMenu;
+                }
+                break;
+            }
+        }
+        prevPageState = pageState;
 
         //arrowObject.rectTransform.position = initialArrowCoordinate - (int)arrowState * arrowMoveSize * new Vector3(0, -1, 0);
-        prevArrowState = arrowState;
     }
 
     private void ExecuteCommand(ArrowState e) {
@@ -81,7 +108,7 @@ public class Title : MonoBehaviour {
             case ArrowState.JoinToServer: {
                 statusObject.text = "Connecting....";
 
-                MapController.nm = new NetworksManager("192.168.1.7", 5522);
+                MapController.nm = new NetworksManager(ip, port);
                 MapController.nm.Connect();
                 isConnectingServer = true;
                 break;
@@ -91,7 +118,8 @@ public class Title : MonoBehaviour {
                 break;
             }
             case ArrowState.Howtoplay: {
-
+                if(prevPageState != PageState.HowToPlay)
+                    pageState = PageState.HowToPlay;
                 break;
             }
             case ArrowState.Exit: {
@@ -123,6 +151,12 @@ public class Title : MonoBehaviour {
         Selectserver = 1,
         Howtoplay = 2,
         Exit = 3,
+    }
+    enum PageState {
+        MainMenu = 0,
+        HowToPlay = 1,
+        SelectServer = 2,
+        Ranking = 3,
     }
     private void EnumBoundCheck() =>
         arrowState = (ArrowState)Math.Max(0, Math.Min((int)ArrowState.Exit, (int)arrowState));
