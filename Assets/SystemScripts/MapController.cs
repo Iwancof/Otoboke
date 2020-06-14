@@ -222,7 +222,7 @@ public class MapController : MonoBehaviour {
     public void UpdatePacmanInfo(PacmanCoordinateForJson cc) {
         Logger.Log(Logger.CommunicationDebugTag, "Pacman at " + cc.Pacman.ToString());
         pacmanController.targetPos = cc.Pacman.ToVector();
-        pacmanController.time = 0.2f;
+        pacmanController.powerTime = 0.2f;
     }
 
     public static string VectorToString(Vector3 vc) {

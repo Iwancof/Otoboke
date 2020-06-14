@@ -11,7 +11,7 @@ public class PacmanController: MonoBehaviour
     Animator anim;
     public List<GameObject> Baits;
     bool whichSound = false; // true -> bait0 , false -> bait1
-    public float time = 10f;
+    public float powerTime = 10f;
     public Vector3 targetPos;
 
     Vector3 speed = new Vector3();
@@ -20,14 +20,14 @@ public class PacmanController: MonoBehaviour
 
     Color normal = new Color(1, 1, 0);
     Color power = new Color(0, 0, 1);
-    Color col;
+    SpriteRenderer spr;
 
     void Start()
     {
         anim = GetComponent<Animator>();
         source = GetComponent<AudioSource>();
         anim.speed = 0;
-        col = GetComponent<SpriteRenderer>().color;
+        spr = GetComponent<SpriteRenderer>();
     }
 
     bool teleportFlag = false;
@@ -37,12 +37,12 @@ public class PacmanController: MonoBehaviour
             return;
         }
         if(PointManager.hasPower) {
-            col = power;
+            spr.color = power;
         } else {
-            col = normal;
+            spr.color = normal;
         }
         if(targetPos != teleportPoint[0] && targetPos != teleportPoint[1]) {
-            transform.position = Vector3.SmoothDamp(transform.position, targetPos, ref speed, time);
+            transform.position = Vector3.SmoothDamp(transform.position, targetPos, ref speed, powerTime);
             teleportFlag = true;
         } else if(teleportFlag) {
             transform.position = new MySwitch<Vector3, Vector3>(targetPos)
