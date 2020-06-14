@@ -139,7 +139,7 @@ public class Player : MonoBehaviour {
     }
 
     private void OnCollisionEnter2D (Collision2D collision) {
-        if (collision.gameObject.tag == "Pacman" && !isDead) {
+        if (PointManager.hasPower && collision.gameObject.tag == "Pacman" && !isDead) {
             isDead = true;
             Defeat ();
         }
