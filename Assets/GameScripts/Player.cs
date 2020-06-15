@@ -164,7 +164,7 @@ public class Player : MonoBehaviour {
 
         var posnow = transform.position;
 
-        startTime = Time.timeSinceLevelLoad;
+        startTime = Time.time;
         firstPos = posnow;
         this.time = time;
         distance = pos - posnow;
@@ -174,7 +174,7 @@ public class Player : MonoBehaviour {
             if (time <= 0) {
                 transform.position = pos;
             }
-            var diff = Time.timeSinceLevelLoad - startTime;
+            var diff = Time.time - startTime;
             var rate = diff / time;
             if (rate >= 1) {
                 firsttime = true;

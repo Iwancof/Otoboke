@@ -24,6 +24,7 @@ public class PointManager : MonoBehaviour
     {
         duration = 10;
         defeat = false;
+        hasPower = false;
         numOfBite = 0;
         baites = -1;
         slider = GameObject.Find("Canvas/Slider").GetComponent<Slider>();
@@ -39,16 +40,16 @@ public class PointManager : MonoBehaviour
             return;
         }
         if(timerFt) {
-            gameStartTime = Time.timeSinceLevelLoad;
+            gameStartTime = Time.time;
         }
-        timelimit.text = "Time limit:" + (timeLimit - Time.timeSinceLevelLoad + gameStartTime).ToString("F1");
+        timelimit.text = "Time limit:" + (timeLimit - Time.time + gameStartTime).ToString("F1");
         if(hasPower) {
-            diff = Time.timeSinceLevelLoad - startTime;
+            diff = Time.time - startTime;
             if(diff >= duration) {
                 hasPower = false;
             }
         }        
-        if(numOfBite <= baites || Time.timeSinceLevelLoad - gameStartTime >= timeLimit) { // パックマンが餌を食べ尽くした
+        if(numOfBite <= baites || Time.time - gameStartTime >= timeLimit) { // パックマンが餌を食べ尽くした
             // ゲームオーバー処理
             defeat = true;
         }

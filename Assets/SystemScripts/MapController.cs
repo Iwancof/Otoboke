@@ -47,6 +47,8 @@ public class MapController : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
+        FirstTimeClass.Reset();
+        Map.DestroyList = new Dictionary<(int x, int y), (MapChip, GameObject)>();
         /* ロガーの有効化 */
         //Logger.enable(Logger.GameSystemProcTag);
         Logger.enable(Logger.CommunicationDebugTag);
@@ -235,11 +237,22 @@ public class MapController : MonoBehaviour {
 }
 
 class FirstTimeClass {
+    static List<bool> boList = new List<bool>();
+    int idx = 0;
     bool b = true;
-    public FirstTimeClass() { }
+    public FirstTimeClass() {
+        boList.Add(true);
+        idx = boList.Count - 1;
+    }
+    public static void Reset() {
+        for(int i = 0; i < boList.Count; i++) {
+            boList[i] = true;
+        }
+    }
     public static implicit operator bool(FirstTimeClass f) {
-        bool ret = f.b;
-        f.b = false;
+        //bool ret = f.b;
+        bool ret = boList[f.idx];
+        boList[f.idx] = false;
         return ret;
     }
 }

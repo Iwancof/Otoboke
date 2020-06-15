@@ -107,7 +107,7 @@ public class PacmanController: MonoBehaviour
             case MapChip.PowerBait:
                 if (PointManager.baites == -1) PointManager.baites = 0;
                 PointManager.baites++;
-                PointManager.startTime = Time.timeSinceLevelLoad;
+                PointManager.startTime = Time.time;
                 PointManager.hasPower = true;
                 Destroy(paced_object.Item2);
                 break;
