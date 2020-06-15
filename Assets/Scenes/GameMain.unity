@@ -1026,6 +1026,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   opening: {fileID: 8300000, guid: b79a8cc4778d1c8438849efed3528a15, type: 3}
   bgm: {fileID: 8300000, guid: 50f9e8e845866fd43a2b1768e73c3580, type: 3}
+  poweredBgm: {fileID: 8300000, guid: 55207a05902bc8e49b7a31166a13b88a, type: 3}
 --- !u!4 &1531907957
 Transform:
   m_ObjectHideFlags: 0

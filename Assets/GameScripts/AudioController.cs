@@ -6,13 +6,11 @@ public class AudioController : MonoBehaviour
 {
     AudioSource source;
     [SerializeField]
-    AudioClip opening;
-    [SerializeField]
-    AudioClip bgm;
+    AudioClip opening, bgm, poweredBgm;
     FirstTimeClass openingFt = new FirstTimeClass(), bgmFt = new FirstTimeClass();
     enum BGM {
         opening,
-        bgm
+        bgm,
     };
     BGM bgmStatus;
     void Start()
@@ -21,14 +19,31 @@ public class AudioController : MonoBehaviour
         source.clip = opening;
         bgmStatus = BGM.opening;
     }
+    bool poweredBgmFt = true;
+    bool normalBgmFt = true;
 
     void Update()
     {
         switch(bgmStatus) {
             case BGM.bgm: {
-                if(bgmFt) {
-                    source.volume = 0.5f;
-                    source.Play();
+                if(PointManager.hasPower) {
+                    if(poweredBgmFt) {
+                        source.Stop();
+                        source.volume = 0.25f;
+                        source.clip = poweredBgm;
+                        source.Play();
+                        poweredBgmFt = false;
+                        normalBgmFt = true;
+                    }
+                } else {
+                    if(normalBgmFt) {
+                        source.Stop();
+                        source.volume = 0.5f;
+                        source.clip = bgm;
+                        source.Play();
+                        normalBgmFt = false;
+                        poweredBgmFt = true;
+                    }
                 }
                 break;
             }
