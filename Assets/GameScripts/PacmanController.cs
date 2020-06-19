@@ -6,7 +6,7 @@ using System.Linq;
 public class PacmanController: MonoBehaviour
 {
     [SerializeField]
-    AudioClip bait0, bait1;
+    AudioClip bait0 = default, bait1 = default, ate = default;
     AudioSource source;
     Animator anim;
     public List<GameObject> Baits;

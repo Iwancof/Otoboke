@@ -239,7 +239,7 @@ public class MapController : MonoBehaviour {
 class FirstTimeClass {
     static List<bool> boList = new List<bool>();
     int idx = 0;
-    bool b = true;
+    //bool b = true;
     public FirstTimeClass() {
         boList.Add(true);
         idx = boList.Count - 1;
@@ -327,7 +327,7 @@ public class PacedCoordinateForJson {
 
 [System.Serializable]
 class ForCountPlayerClass {
-    public int value;
+    public int value = default;
 };
 
 static class StringExtension {

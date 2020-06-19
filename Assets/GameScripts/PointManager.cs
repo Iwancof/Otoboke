@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class PointManager : MonoBehaviour
 {
-    int score = 0;
     public static int baites = -1;
     public static bool hasPower = false;
     public static float startTime;
@@ -15,6 +14,7 @@ public class PointManager : MonoBehaviour
     Image img;
     Slider slider;
     Text timelimit;
+    GameObject ready;
     int prevBites;
 
     public static float gameStartTime;
@@ -31,6 +31,9 @@ public class PointManager : MonoBehaviour
         img = GameObject.Find("Canvas/Slider/FillArea/Fill").GetComponent<Image>();
         img.color = new Color(0, 255, 0);
         timelimit = GameObject.Find("Canvas/TimeLimit").GetComponent<Text>();
+        ready = GameObject.Find("Canvas/READY");
+        ready.SetActive(true);
+
     }
 
     void Update()
@@ -40,6 +43,7 @@ public class PointManager : MonoBehaviour
             return;
         }
         if(timerFt) {
+            ready.SetActive(false);
             gameStartTime = Time.time;
         }
         timelimit.text = "Time limit:" + (timeLimit - Time.time + gameStartTime).ToString("F1");

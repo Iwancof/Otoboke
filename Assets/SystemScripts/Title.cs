@@ -19,7 +19,7 @@ public class Title : MonoBehaviour {
     AudioSource source;
 
     [SerializeField]
-    GameObject mainMenu, howToPlay;
+    GameObject mainMenu = default, howToPlay = default;
 
     string ip = "192.168.1.7";
     int port = 5522;

@@ -11,10 +11,10 @@ public class CharacterDecoration : MonoBehaviour
         turnBlink,
     }
     [SerializeField]
-    Color color;
+    Color color = default;
     Color prevColor;
     [SerializeField]
-    DecorationType decoration;
+    DecorationType decoration = default;
     // Start is called before the first frame update
     void Start()
     {

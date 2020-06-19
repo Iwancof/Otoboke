@@ -6,7 +6,7 @@ public class AudioController : MonoBehaviour
 {
     AudioSource source;
     [SerializeField]
-    AudioClip opening, bgm, poweredBgm;
+    AudioClip opening = default, bgm = default, poweredBgm = default;
     FirstTimeClass openingFt = new FirstTimeClass(), bgmFt = new FirstTimeClass();
     enum BGM {
         opening,

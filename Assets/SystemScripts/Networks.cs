@@ -38,7 +38,7 @@ public class NetworksManager {
         Logger.Log(Logger.GeneralSystemTag, "Selected dafalt server(localhost:8080).");
     }
     [System.Serializable]
-    class ForIDCounterClass { public int counter; };
+    class ForIDCounterClass { public int counter = default; };
     public async void Connect() {
         await Task.Run(() => {
             (new Action(async () => {

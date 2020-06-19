@@ -160,7 +160,7 @@ public class Player : MonoBehaviour {
     }
 
     IEnumerator MoveCoroutine (Vector3 pos, float time) {
-        firsttime = true;
+        this.firsttime = true;
 
         var posnow = transform.position;
 
@@ -168,7 +168,7 @@ public class Player : MonoBehaviour {
         firstPos = posnow;
         this.time = time;
         distance = pos - posnow;
-        firsttime = false;
+        this.firsttime = false;
 
         while (Vector3.Distance (transform.position, pos) > 0.05f) {
             if (time <= 0) {
@@ -177,7 +177,7 @@ public class Player : MonoBehaviour {
             var diff = Time.time - startTime;
             var rate = diff / time;
             if (rate >= 1) {
-                firsttime = true;
+                this.firsttime = true;
                 pos = transform.position;
                 break;
             }
