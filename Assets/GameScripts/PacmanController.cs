@@ -96,12 +96,15 @@ public class PacmanController: MonoBehaviour
                 if (PointManager.baites == -1) PointManager.baites = 0;
                 PointManager.baites++;
                 whichSound = !whichSound;
-                if (whichSound) {
-                    source.clip = bait0;
-                } else {
-                    source.clip = bait1;
+                if(!source.isPlaying) {
+                    PointManager.returningNest = false;
+                    if (whichSound) {
+                        source.clip = bait0;
+                    } else {
+                        source.clip = bait1;
+                    }
+                    source.Play();
                 }
-                source.Play();
                 Destroy(paced_object.Item2);
                 break;
             case MapChip.PowerBait:
@@ -112,6 +115,36 @@ public class PacmanController: MonoBehaviour
                 Destroy(paced_object.Item2);
                 break;
         }
+    }
+
+    List<GameObject> returningPlayers = new List<GameObject>();
+    void OnCollisionEnter2D(Collision2D collision) {
+        GameObject player = collision.collider.transform.gameObject;
+        if(PointManager.hasPower && collision.collider.tag == "Player" && !ExistInReturningPlayers(player)) {
+            source.Stop();
+            source.clip = ate;
+            source.Play();
+            PointManager.returningNest = true;
+            returningPlayers.Add(player);
+            StartCoroutine("IsReturningNest", player);
+        }
+    }
+
+    bool ExistInReturningPlayers(GameObject player) {
+        foreach(var e in returningPlayers) {
+            if(e == player) return true;
+        }
+        return false;
+    }
+    
+    // FIXME: すでにぶつかったプレイヤーは無視する
+    IEnumerator IsReturningNest(GameObject player) {
+        while(Vector3.Distance(player.transform.position, Player.respownPoint) > 1f) {
+            yield return null;
+        }
+        Debug.LogWarning(player.transform.position);
+        PointManager.returningNest = false;
+        returningPlayers.RemoveAll(p => p == player);
     }
 
     public (MapChip, GameObject) FindBaitObjectByCoordinate(int px, int py) {

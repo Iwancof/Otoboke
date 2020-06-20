@@ -197,7 +197,7 @@ public class Player : MonoBehaviour {
         direction[3] = (-1, 0);
         var count = 0;
 
-        while (root[pos.x][pos.y] != 1 && count++ < 100) {
+        while (root[pos.x][pos.y] != 0 && count++ < 100) {
             pos = GetCoordinate (transform.position);
             foreach (var dir in direction) {
                 (int x, int y) target = (pos.x + dir.x, pos.y + dir.y);

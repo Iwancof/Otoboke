@@ -10,6 +10,7 @@ public class PointManager : MonoBehaviour
     public static float startTime;
     float duration, diff;
     public static int numOfBite = 0;
+    public static bool returningNest = false;
     public static bool defeat = false;
     Image img;
     Slider slider;
