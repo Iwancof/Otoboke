@@ -30,6 +30,10 @@ public class Player : MonoBehaviour {
     GameObject animObj;
     Vector3 prev;
     Vector3 now;
+    [SerializeField, HeaderAttribute("フリック感度"), Range(0.1f, 10.0f)]
+    float flickSensitivity = 1.0f;
+    bool touchFlag = true;
+    Vector3 touchedPos, liftedFingerPos;    // モバイル端末等のフリック操作用
     void Start () {
         now = transform.position;
         prev = transform.position;
@@ -104,13 +108,30 @@ public class Player : MonoBehaviour {
     }
 
     void InputBuffer () {
-        float x = Input.GetAxis ("Horizontal");
-        float y = Input.GetAxis ("Vertical");
-        if (Mathf.Abs (x) >= 0.1f && y == 0) {
-            buffer = new Vector2 (x / Mathf.Abs (x), 0);
-        }
-        if (Mathf.Abs (y) >= 0.1f && x == 0) {
-            buffer = new Vector2 (0, y / Mathf.Abs (y));
+        if(Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer) {
+            if(Input.touches[0].phase == TouchPhase.Began && touchFlag) {
+                touchedPos = Input.touches[0].position;
+                touchFlag = false;
+            } else if(Input.touches[0].phase == TouchPhase.Ended && !touchFlag) {
+                liftedFingerPos = Input.touches[0].position;
+                touchFlag = true;
+                Vector3 dist = liftedFingerPos - touchedPos;
+                if (Mathf.Abs (dist.x) >= flickSensitivity && Mathf.Abs(dist.y) < Mathf.Abs(dist.x)) {
+                    buffer = new Vector2 (dist.x / Mathf.Abs (dist.x), 0);
+                }
+                if (Mathf.Abs (dist.y) >= flickSensitivity && Mathf.Abs(dist.y) >= Mathf.Abs(dist.x)) {
+                    buffer = new Vector2 (0, dist.y / Mathf.Abs (dist.y));
+                }
+            }
+        } else {
+            float x = Input.GetAxis ("Horizontal");
+            float y = Input.GetAxis ("Vertical");
+            if (Mathf.Abs (x) >= 0.1f && y == 0) {
+                buffer = new Vector2 (x / Mathf.Abs (x), 0);
+            }
+            if (Mathf.Abs (y) >= 0.1f && x == 0) {
+                buffer = new Vector2 (0, y / Mathf.Abs (y));
+            }
         }
     }
 
