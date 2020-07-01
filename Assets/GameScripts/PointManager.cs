@@ -12,6 +12,7 @@ public class PointManager : MonoBehaviour
     public static int numOfBite = 0;
     public static bool returningNest = false;
     public static bool defeat = false;
+    public static bool clear = false;
     Image img;
     Slider slider;
     Text timelimit;

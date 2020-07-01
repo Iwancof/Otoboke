@@ -136,12 +136,15 @@ public class MapController : MonoBehaviour {
                     Logger.Log(Logger.CommunicationDebugTag, $"Pacman status is {get_data.Data}");
                     switch (get_data.Data) {
                         case "Normal": {
-
                             break;
                         }
                         case "Powered": {
                             break;
                         }
+                    }
+                } else if (get_data.Tag == "GAMSTA") {
+                    if(get_data.Data == "PACMAN died") {
+                        PointManager.clear = true;
                     }
                 } else {
                     throw new Exception($"{get_data.Tag} is Invalid tag. ");
