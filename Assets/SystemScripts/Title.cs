@@ -21,7 +21,7 @@ public class Title : MonoBehaviour {
 
     [SerializeField]
     GameObject mainMenu = default, howToPlay = default, selectServer = default;
-    Text ipObject;
+    InputField ipObject;
 
     Vector2 swipeDir = Vector2.zero;
 
@@ -36,7 +36,7 @@ public class Title : MonoBehaviour {
         canStartGame = false;
         isConnectingServer = false;
         source = GetComponent<AudioSource>();
-        ipObject = selectServer.transform.Find("InputField").Find("Text").gameObject.GetComponent<Text>();
+        ipObject = selectServer.transform.Find("InputField").GetComponent<InputField>();
         selectServer.transform.Find("InputField").Find("Placeholder").gameObject.GetComponent<Text>().text = ip;
     }
 
@@ -128,6 +128,8 @@ public class Title : MonoBehaviour {
     /// IPアドレスの入力とフォーマットの確認
     /// </summary>
     public void InputLogger() {
+        ip = ipObject.text;
+        return;
         int[] tmpIp = null;
         try {
             tmpIp = ipObject.text.Split('.').ToList().Select(x => int.Parse(x)).ToArray();
