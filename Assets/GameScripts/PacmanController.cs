@@ -116,8 +116,6 @@ public class PacmanController: MonoBehaviour
                 break;
         }
     }
-    public winTheGame() {
-    }
 
     List<GameObject> returningPlayers = new List<GameObject>();
     void OnCollisionEnter2D(Collision2D collision) {
