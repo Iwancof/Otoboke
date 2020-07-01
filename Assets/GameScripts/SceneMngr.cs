@@ -9,10 +9,11 @@ public class SceneMngr : MonoBehaviour
         Title,
         GameMain,
         GameOver,
+        GameClear,
     };
     SceneType currentScene;
     string currentSceneString;
-    static AsyncOperation asyncOperation;
+    static AsyncOperation asyncOperation, clearOperation;
     // Start is called before the first frame update
     void Start()
     {
@@ -21,6 +22,7 @@ public class SceneMngr : MonoBehaviour
             case "GameOver": currentScene = SceneType.GameOver; break;
             case "Title": currentScene = SceneType.Title; break;
             case "GameMain": currentScene = SceneType.GameMain; break;
+            case "GameClear": currentScene = SceneType.GameClear; break;
             default: currentScene = SceneType.Title; break;
         }
         switch(currentScene) {
@@ -34,6 +36,13 @@ public class SceneMngr : MonoBehaviour
             }
             case SceneType.GameMain: {
                 asyncOperation = SceneManager.LoadSceneAsync("GameOver");
+                clearOperation = SceneManager.LoadSceneAsync("GameClear");
+                asyncOperation.allowSceneActivation = false;
+                clearOperation.allowSceneActivation = false;
+                break;
+            }
+            case SceneType.GameClear: {
+                asyncOperation = SceneManager.LoadSceneAsync("Title");
                 asyncOperation.allowSceneActivation = false;
                 break;
             }
@@ -56,6 +65,11 @@ public class SceneMngr : MonoBehaviour
             }
             case SceneType.GameMain: {
                 if(PointManager.defeat) asyncOperation.allowSceneActivation = true;
+                if (PointManager.clear) clearOperation.allowSceneActivation = true;
+                break;
+            }
+            case SceneType.GameClear: {
+                if (Input.GetKeyDown(KeyCode.Return)) asyncOperation.allowSceneActivation = true;
                 break;
             }
         }
