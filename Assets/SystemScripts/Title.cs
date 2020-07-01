@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 using System;
 
 public class Title : MonoBehaviour {
@@ -19,20 +20,24 @@ public class Title : MonoBehaviour {
     AudioSource source;
 
     [SerializeField]
-    GameObject mainMenu = default, howToPlay = default;
+    GameObject mainMenu = default, howToPlay = default, selectServer = default;
+    Text ipObject;
+
+    Vector2 swipeDir = Vector2.zero;
 
     string ip = "192.168.1.7";
     int port = 5522;
 
     // Start is called before the first frame update
     void Start() {
-        ip = "localhost";
         initialArrowCoordinate = 
             GameObject.Find("Canvas").transform.position +
             new Vector3(11, 15, 0);
         canStartGame = false;
         isConnectingServer = false;
         source = GetComponent<AudioSource>();
+        ipObject = selectServer.transform.Find("InputField").Find("Text").gameObject.GetComponent<Text>();
+        selectServer.transform.Find("InputField").Find("Placeholder").gameObject.GetComponent<Text>().text = ip;
     }
 
     float time = 0f;
@@ -60,13 +65,19 @@ public class Title : MonoBehaviour {
         switch(pageState) {
             case PageState.MainMenu: {
                 mainMenu.SetActive(true);
+                selectServer.SetActive(false);
                 howToPlay.SetActive(false);
-                if (Input.GetKeyDown(KeyCode.J) || Input.GetKeyDown(KeyCode.DownArrow)) {
+
+                swipeDir = Vector2.zero;
+                if(Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer) {
+                    swipeDir = Swipe.SwipeDirection();
+                }
+                if (Input.GetKeyDown(KeyCode.J) || Input.GetKeyDown(KeyCode.DownArrow) || swipeDir == Vector2.down) {
                     arrowState++;
                     source.clip = selectSound;
                     source.Play();
                 }
-                if (Input.GetKeyDown(KeyCode.K) || Input.GetKeyDown(KeyCode.UpArrow)) {
+                if (Input.GetKeyDown(KeyCode.K) || Input.GetKeyDown(KeyCode.UpArrow) || swipeDir == Vector2.up) {
                     arrowState--;
                     source.clip = selectSound;
                     source.Play();
@@ -78,7 +89,7 @@ public class Title : MonoBehaviour {
                 SetString(str);
                 //statusObject.text = arrowState.ToString() + ":" + str.Length;
 
-                if (Input.GetKeyDown(KeyCode.Return)) {
+                if (Input.GetKeyDown(KeyCode.Return) || swipeDir == Vector2.right) {
                     ExecuteCommand(arrowState);
                 }
                 prevArrowState = arrowState;
@@ -87,7 +98,19 @@ public class Title : MonoBehaviour {
 
             case PageState.HowToPlay: {
                 mainMenu.SetActive(false);
+                selectServer.SetActive(false);
                 howToPlay.SetActive(true);
+                if(Input.GetKeyDown(KeyCode.Return) || swipeDir == Vector2.right) {
+                    source.clip = enterSound;
+                    source.Play();
+                    pageState = PageState.MainMenu;
+                }
+                break;
+            }
+            case PageState.SelectServer: {
+                mainMenu.SetActive(false);
+                howToPlay.SetActive(false);
+                selectServer.SetActive(true);
                 if(Input.GetKeyDown(KeyCode.Return)) {
                     source.clip = enterSound;
                     source.Play();
@@ -99,6 +122,34 @@ public class Title : MonoBehaviour {
         prevPageState = pageState;
 
         //arrowObject.rectTransform.position = initialArrowCoordinate - (int)arrowState * arrowMoveSize * new Vector3(0, -1, 0);
+    }
+
+    /// <summary>
+    /// IPアドレスの入力とフォーマットの確認
+    /// </summary>
+    public void InputLogger() {
+        int[] tmpIp = null;
+        try {
+            tmpIp = ipObject.text.Split('.').ToList().Select(x => int.Parse(x)).ToArray();
+            bool err = false;
+            foreach(var t in tmpIp) {
+                if(!(0 <= t && t <= 255)) {
+                    err = true;
+                    break;
+                }
+            }
+            if(tmpIp.Length != 4) err = true;
+            if(err) {
+                Debug.LogError("ipアドレスのフォーマットが違うよ");
+                return;
+            }
+            ip = ipObject.text;
+            selectServer.transform.Find("InputField").Find("Placeholder").gameObject.GetComponent<Text>().text = ip;
+        } catch(FormatException fe) {
+            Debug.LogError("ipアドレスのフォーマットが違うよ:" + fe);
+            return;
+        }
+        ipObject.text = "";
     }
 
     private void ExecuteCommand(ArrowState e) {
@@ -114,7 +165,8 @@ public class Title : MonoBehaviour {
                 break;
             }
             case ArrowState.Selectserver: {
-                
+                if(prevPageState != PageState.SelectServer)
+                    pageState = PageState.SelectServer;
                 break;
             }
             case ArrowState.Howtoplay: {
