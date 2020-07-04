@@ -37,6 +37,7 @@ public class Title : MonoBehaviour {
         isConnectingServer = false;
         source = GetComponent<AudioSource>();
         ipObject = selectServer.transform.Find("InputField").GetComponent<InputField>();
+        ip = PlayerPrefs.GetString("IP", ip);
         selectServer.transform.Find("InputField").Find("Placeholder").gameObject.GetComponent<Text>().text = ip;
     }
 
@@ -129,6 +130,7 @@ public class Title : MonoBehaviour {
     /// </summary>
     public void InputLogger() {
         ip = ipObject.text;
+        PlayerPrefs.SetString("IP", ip);
         return;
         int[] tmpIp = null;
         try {

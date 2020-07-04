@@ -25,8 +25,10 @@ public class SceneMngr : MonoBehaviour
             case "GameClear": currentScene = SceneType.GameClear; break;
             default: currentScene = SceneType.Title; break;
         }
+        /*
         switch(currentScene) {
             case SceneType.GameOver: {
+                SceneManager.UnloadSceneAsync("GameClear");
                 asyncOperation = SceneManager.LoadSceneAsync("Title");
                 asyncOperation.allowSceneActivation = false;
                 break;
@@ -42,11 +44,14 @@ public class SceneMngr : MonoBehaviour
                 break;
             }
             case SceneType.GameClear: {
+                SceneManager.UnloadSceneAsync("GameOver");
                 asyncOperation = SceneManager.LoadSceneAsync("Title");
                 asyncOperation.allowSceneActivation = false;
                 break;
             }
         }
+        */
+        Debug.LogWarning(currentSceneString);
     }
 
     // Update is called once per frame
@@ -60,16 +65,17 @@ public class SceneMngr : MonoBehaviour
                 break;
             }
             case SceneType.GameOver: {
-                if(Input.GetKeyDown(KeyCode.Return)) asyncOperation.allowSceneActivation = true;
+                //if(Input.GetKeyDown(KeyCode.Return)) SceneManager.LoadSceneAsync("Title");//asyncOperation.allowSceneActivation = true;
+                goto case SceneType.GameClear;
+            }
+            case SceneType.GameClear: {
+                if(Input.GetKeyDown(KeyCode.Return)) SceneManager.LoadSceneAsync("Title");//asyncOperation.allowSceneActivation = true;
+                //if (Input.GetKeyDown(KeyCode.Return)) asyncOperation.allowSceneActivation = true;
                 break;
             }
             case SceneType.GameMain: {
-                if(PointManager.defeat) asyncOperation.allowSceneActivation = true;
-                if (PointManager.clear) clearOperation.allowSceneActivation = true;
-                break;
-            }
-            case SceneType.GameClear: {
-                if (Input.GetKeyDown(KeyCode.Return)) asyncOperation.allowSceneActivation = true;
+                if(PointManager.clear) SceneManager.LoadSceneAsync("GameClear");//clearOperation.allowSceneActivation = true;
+                if(PointManager.defeat) SceneManager.LoadSceneAsync("GameOver");//asyncOperation.allowSceneActivation = true;
                 break;
             }
         }

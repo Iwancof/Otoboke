@@ -20,12 +20,13 @@ public class PointManager : MonoBehaviour
     int prevBites;
 
     public static float gameStartTime;
-    float timeLimit = 30;
+    float timeLimit = 60;
     FirstTimeClass timerFt = new FirstTimeClass();
     void Start()
     {
         duration = 10;
         defeat = false;
+        clear = false;
         hasPower = false;
         numOfBite = 0;
         baites = -1;
