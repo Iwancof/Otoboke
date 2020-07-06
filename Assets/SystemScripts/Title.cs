@@ -85,8 +85,22 @@ public class Title : MonoBehaviour {
                 }
                 EnumBoundCheck();
                 string[] str = GetString();
-                str[(int)prevArrowState] = "　" + str[(int)prevArrowState].Remove(0, 1);
-                str[(int)arrowState] = "▶" + str[(int)arrowState].Remove(0, 1);
+                 //"　" + str[(int)prevArrowState].Remove(0, 1);
+                char[] tmp = str[(int)prevArrowState].ToCharArray();
+                if(tmp.Length >= 14) {
+                    tmp[0] = '　';
+                    tmp[14] = 'F';
+                    tmp[15] = 'F';
+                    str[(int)prevArrowState] = new String(tmp);
+                }
+                //str[(int)arrowState] = "▶" + str[(int)arrowState].Remove(0, 1);
+                char[] tmp2 = str[(int)arrowState].ToCharArray();
+                if(tmp2.Length >= 14) {
+                    tmp2[0] = '▶';
+                    tmp2[14] = '0';
+                    tmp2[15] = '0';
+                    str[(int)arrowState] = new String(tmp2);
+                }
                 SetString(str);
                 //statusObject.text = arrowState.ToString() + ":" + str.Length;
 

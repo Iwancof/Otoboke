@@ -18,10 +18,16 @@ public class CharacterDecoration : MonoBehaviour
     bool firstFlag = true;
     [SerializeField]
     GameObject activeObject = default;
+    [SerializeField]
+    float speed = 0.2f;
+    [SerializeField, TooltipAttribute("Turn Blink時のみ")]
+    float waitTime = 1;
+    string turnTxt;
     // Start is called before the first frame update
     void Start()
     {
         text = GetComponent<Text>();
+        turnTxt = text.text;
         prevColor = text.color;
         firstFlag = true;
     }
@@ -41,6 +47,7 @@ public class CharacterDecoration : MonoBehaviour
                     break;
                 }
                 case DecorationType.turnBlink: {
+                    StartCoroutine(Turn());
                     break;
                 }
             }
@@ -50,18 +57,31 @@ public class CharacterDecoration : MonoBehaviour
     IEnumerator Synchro() {
         while(activeObject.activeInHierarchy) {
             text.color = color;
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(speed);
             text.color = prevColor;
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(speed);
         }
     }
 
     IEnumerator Turn() {
         while(activeObject.gameObject.activeInHierarchy) {
             int i = 0;
-            while(text.text.Length > i) {
-                yield return new WaitForSeconds(0.2f);
+            while(turnTxt.Length > i) {
+                string txt;
+                if(turnTxt.Length-1 > i) {
+                    txt = turnTxt.Substring(0, i) + "<color=" + Col2String(color) + ">" + turnTxt[i] + "</color>" + turnTxt.Substring(i+1);
+                } else {
+                    txt = turnTxt.Substring(0, i) + "<color=" + Col2String(color) + ">" + turnTxt[i] + "</color>";
+                }
+                text.text = txt;
+                yield return new WaitForSeconds(speed);
+                i++;
             }
+            text.text = turnTxt;
+            yield return new WaitForSeconds(waitTime);
         }
+    }
+    string Col2String(Color color) {
+        return "#" + ((int)(color.r * 255)).ToString("X") + ((int)(color.g * 255)).ToString("X") + ((int)(color.b * 255)).ToString("X");
     }
 }
