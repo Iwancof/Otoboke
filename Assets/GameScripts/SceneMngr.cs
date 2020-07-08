@@ -65,20 +65,25 @@ public class SceneMngr : MonoBehaviour
                 break;
             }
             case SceneType.GameOver: {
-                //if(Input.GetKeyDown(KeyCode.Return)) SceneManager.LoadSceneAsync("Title");//asyncOperation.allowSceneActivation = true;
                 goto case SceneType.GameClear;
             }
             case SceneType.GameClear: {
-                if(Input.GetKeyDown(KeyCode.Return)) SceneManager.LoadSceneAsync("Title");//asyncOperation.allowSceneActivation = true;
-                //if (Input.GetKeyDown(KeyCode.Return)) asyncOperation.allowSceneActivation = true;
+                if(Input.GetKeyDown(KeyCode.Return)) SceneManager.LoadSceneAsync("Title");
+                CheckBackToTitle();
                 break;
             }
             case SceneType.GameMain: {
-                if(PointManager.clear) SceneManager.LoadSceneAsync("GameClear");//clearOperation.allowSceneActivation = true;
-                if(PointManager.defeat) SceneManager.LoadSceneAsync("GameOver");//asyncOperation.allowSceneActivation = true;
+                if(PointManager.clear) SceneManager.LoadSceneAsync("GameClear");
+                if(PointManager.defeat) SceneManager.LoadSceneAsync("GameOver");
+                CheckBackToTitle();
                 break;
             }
         }
     }
 
+    void CheckBackToTitle() {
+        if(Input.GetKeyDown(KeyCode.Escape)) {
+            SceneManager.LoadScene("Title");
+        }
+    }
 }
