@@ -30,7 +30,7 @@ public class MapController : MonoBehaviour {
     List<(int x, int y)> PacedTemporaryCoordinates = new List<(int x, int y)>();
     Text textobj;
     public static CancellationTokenSource tokenSource = new CancellationTokenSource();
-    private Color[] Colors = { Color.red, Color.green, Color.blue };
+    private Color[] Colors = { Color.red, Color.green };
     public static float size = 1.05f; //this will fix
 
     public enum SystemStatus {
@@ -214,7 +214,7 @@ public class MapController : MonoBehaviour {
             if (i == nm.client_id) continue;
             var obj = MonoBehaviour.Instantiate((GameObject)Resources.Load("OtherPlayer"), new Vector3(15, 20, 0), Quaternion.identity);
             obj.name = $"client{i}";
-            obj.transform.Find("Anim").GetComponent<SpriteRenderer>().material.color = Colors[i];
+            obj.transform.Find("Anim").GetComponent<SpriteRenderer>().material.color = Colors[i % Colors.Length];
             players.Add(i, GameObject.Find($"client{i}"));
         }
     }
