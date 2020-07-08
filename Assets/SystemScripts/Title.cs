@@ -25,11 +25,12 @@ public class Title : MonoBehaviour {
 
     Vector2 swipeDir = Vector2.zero;
 
-    string ip = "192.168.1.7";
+    string ip = "35.188.97.54";
     int port = 5522;
 
     // Start is called before the first frame update
     void Start() {
+        PlayerPrefs.SetString("IP", "35.188.97.54");
         initialArrowCoordinate = 
             GameObject.Find("Canvas").transform.position +
             new Vector3(11, 15, 0);
