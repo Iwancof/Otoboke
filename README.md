@@ -12,4 +12,4 @@
 - フロントエンド：Unity
 - サーバー：Rust
 
-サーバーのリポジトリは[https://github.com/Iwancof/OtobokeServer]()です。
+サーバーのリポジトリは[ここ](https://github.com/Iwancof/OtobokeServer)です。
