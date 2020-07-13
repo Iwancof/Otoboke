@@ -20,7 +20,7 @@ public class Title : MonoBehaviour {
     AudioSource source;
 
     [SerializeField]
-    GameObject mainMenu = default, howToPlay = default, selectServer = default;
+    GameObject mainMenu = default, howToPlay = default, settings = default;
     InputField ipObject;
 
     Vector2 swipeDir = Vector2.zero;
@@ -37,9 +37,9 @@ public class Title : MonoBehaviour {
         canStartGame = false;
         isConnectingServer = false;
         source = GetComponent<AudioSource>();
-        ipObject = selectServer.transform.Find("InputField").GetComponent<InputField>();
+        ipObject = settings.transform.Find("InputField").GetComponent<InputField>();
         ip = PlayerPrefs.GetString("IP", ip);
-        selectServer.transform.Find("InputField").Find("Placeholder").gameObject.GetComponent<Text>().text = ip;
+        settings.transform.Find("InputField").Find("Placeholder").gameObject.GetComponent<Text>().text = ip;
     }
 
     float time = 0f;
@@ -50,6 +50,7 @@ public class Title : MonoBehaviour {
             //UnityEngine.SceneManagement.SceneManager.LoadScene("SampleScene");
             return;
         }
+        swipeDir = Vector2.zero;
 
         if (isConnectingServer) {
             time += Time.deltaTime;
@@ -67,10 +68,9 @@ public class Title : MonoBehaviour {
         switch(pageState) {
             case PageState.MainMenu: {
                 mainMenu.SetActive(true);
-                selectServer.SetActive(false);
+                settings.SetActive(false);
                 howToPlay.SetActive(false);
 
-                swipeDir = Vector2.zero;
                 if(Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer) {
                     swipeDir = Swipe.SwipeDirection();
                 }
@@ -114,7 +114,7 @@ public class Title : MonoBehaviour {
 
             case PageState.HowToPlay: {
                 mainMenu.SetActive(false);
-                selectServer.SetActive(false);
+                settings.SetActive(false);
                 howToPlay.SetActive(true);
                 if(Input.GetKeyDown(KeyCode.Return) || swipeDir == Vector2.right) {
                     source.clip = enterSound;
@@ -123,11 +123,11 @@ public class Title : MonoBehaviour {
                 }
                 break;
             }
-            case PageState.SelectServer: {
+            case PageState.Settings: {
                 mainMenu.SetActive(false);
                 howToPlay.SetActive(false);
-                selectServer.SetActive(true);
-                if(Input.GetKeyDown(KeyCode.Return)) {
+                settings.SetActive(true);
+                if(Input.GetKeyDown(KeyCode.Return) || swipeDir == Vector2.right) {
                     source.clip = enterSound;
                     source.Play();
                     pageState = PageState.MainMenu;
@@ -163,7 +163,7 @@ public class Title : MonoBehaviour {
                 return;
             }
             ip = ipObject.text;
-            selectServer.transform.Find("InputField").Find("Placeholder").gameObject.GetComponent<Text>().text = ip;
+            settings.transform.Find("InputField").Find("Placeholder").gameObject.GetComponent<Text>().text = ip;
         } catch(FormatException fe) {
             Debug.LogError("ipアドレスのフォーマットが違うよ:" + fe);
             return;
@@ -183,9 +183,9 @@ public class Title : MonoBehaviour {
                 isConnectingServer = true;
                 break;
             }
-            case ArrowState.Selectserver: {
-                if(prevPageState != PageState.SelectServer)
-                    pageState = PageState.SelectServer;
+            case ArrowState.Settings: {
+                if(prevPageState != PageState.Settings)
+                    pageState = PageState.Settings;
                 break;
             }
             case ArrowState.Howtoplay: {
@@ -219,14 +219,14 @@ public class Title : MonoBehaviour {
 
     enum ArrowState {
         JoinToServer = 0,
-        Selectserver = 1,
+        Settings = 1,
         Howtoplay = 2,
         Exit = 3,
     }
     enum PageState {
         MainMenu = 0,
-        HowToPlay = 1,
-        SelectServer = 2,
+        Settings = 1,
+        HowToPlay = 2,
         Ranking = 3,
     }
     private void EnumBoundCheck() =>

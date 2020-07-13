@@ -267,7 +267,7 @@ MonoBehaviour:
   enterSound: {fileID: 8300000, guid: 45b1bfde0e474a440b61db26bb391a9d, type: 3}
   mainMenu: {fileID: 93554814}
   howToPlay: {fileID: 1556979710}
-  selectServer: {fileID: 758025368}
+  settings: {fileID: 758025368}
 --- !u!4 &105241380
 Transform:
   m_ObjectHideFlags: 0

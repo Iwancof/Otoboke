@@ -1152,6 +1152,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82bbe1168b93b4440a8fa7cb0ed52b8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  materials:
+  - {fileID: 2100000, guid: 0368946381850ae44bec6bda7e556bc0, type: 2}
+  - {fileID: 2100000, guid: e52bd33b7a3ac9746810a86ea22f1cb9, type: 2}
+  - {fileID: 2100000, guid: 308d48ac93bf0c34abcb03fa280bf14e, type: 2}
+  - {fileID: 2100000, guid: a38416d35d7ea3642814ab5406bb268b, type: 2}
+  - {fileID: 2100000, guid: 68a67a6cccd21d44191ddbee6910cb63, type: 2}
 --- !u!4 &1634207179
 Transform:
   m_ObjectHideFlags: 0
