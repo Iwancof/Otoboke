@@ -43,6 +43,7 @@ public class Title : MonoBehaviour {
     }
 
     float time = 0f;
+    (float, float) swipeLog = (0, 0);
 
     // Update is called once per frame
     void Update() {
@@ -50,7 +51,6 @@ public class Title : MonoBehaviour {
             //UnityEngine.SceneManagement.SceneManager.LoadScene("SampleScene");
             return;
         }
-        swipeDir = Vector2.zero;
 
         if (isConnectingServer) {
             time += Time.deltaTime;
@@ -65,21 +65,22 @@ public class Title : MonoBehaviour {
             time = 0f;
         }
 
+        if(Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer) {
+            swipeDir = Swipe.SwipeDirection();
+            swipeLog = (swipeLog.Item1 + swipeDir.x, swipeLog.Item2 + swipeDir.y);
+        }
+
         switch(pageState) {
             case PageState.MainMenu: {
                 mainMenu.SetActive(true);
                 settings.SetActive(false);
                 howToPlay.SetActive(false);
 
-                if(Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer) {
-                    swipeDir = Swipe.SwipeDirection();
-                }
                 if (Input.GetKeyDown(KeyCode.J) || Input.GetKeyDown(KeyCode.DownArrow) || swipeDir == Vector2.down) {
                     arrowState++;
                     source.clip = selectSound;
                     source.Play();
-                }
-                if (Input.GetKeyDown(KeyCode.K) || Input.GetKeyDown(KeyCode.UpArrow) || swipeDir == Vector2.up) {
+                } else if (Input.GetKeyDown(KeyCode.K) || Input.GetKeyDown(KeyCode.UpArrow) || swipeDir == Vector2.up) {
                     arrowState--;
                     source.clip = selectSound;
                     source.Play();
@@ -94,7 +95,6 @@ public class Title : MonoBehaviour {
                     tmp[15] = 'F';
                     str[(int)prevArrowState] = new String(tmp);
                 }
-                //str[(int)arrowState] = "▶" + str[(int)arrowState].Remove(0, 1);
                 char[] tmp2 = str[(int)arrowState].ToCharArray();
                 if(tmp2.Length >= 14) {
                     tmp2[0] = '▶';
@@ -103,7 +103,6 @@ public class Title : MonoBehaviour {
                     str[(int)arrowState] = new String(tmp2);
                 }
                 SetString(str);
-                //statusObject.text = arrowState.ToString() + ":" + str.Length;
 
                 if (Input.GetKeyDown(KeyCode.Return) || swipeDir == Vector2.right) {
                     ExecuteCommand(arrowState);
@@ -116,7 +115,7 @@ public class Title : MonoBehaviour {
                 mainMenu.SetActive(false);
                 settings.SetActive(false);
                 howToPlay.SetActive(true);
-                if(Input.GetKeyDown(KeyCode.Return) || swipeDir == Vector2.right) {
+                if(Input.GetKeyDown(KeyCode.Return) || swipeDir == Vector2.left) {
                     source.clip = enterSound;
                     source.Play();
                     pageState = PageState.MainMenu;
@@ -127,7 +126,7 @@ public class Title : MonoBehaviour {
                 mainMenu.SetActive(false);
                 howToPlay.SetActive(false);
                 settings.SetActive(true);
-                if(Input.GetKeyDown(KeyCode.Return) || swipeDir == Vector2.right) {
+                if(Input.GetKeyDown(KeyCode.Return) || swipeDir == Vector2.left) {
                     source.clip = enterSound;
                     source.Play();
                     pageState = PageState.MainMenu;
@@ -147,6 +146,7 @@ public class Title : MonoBehaviour {
         ip = ipObject.text;
         PlayerPrefs.SetString("IP", ip);
         return;
+        /*
         int[] tmpIp = null;
         try {
             tmpIp = ipObject.text.Split('.').ToList().Select(x => int.Parse(x)).ToArray();
@@ -168,7 +168,7 @@ public class Title : MonoBehaviour {
             Debug.LogError("ipアドレスのフォーマットが違うよ:" + fe);
             return;
         }
-        ipObject.text = "";
+        ipObject.text = "";*/
     }
 
     private void ExecuteCommand(ArrowState e) {
@@ -184,12 +184,13 @@ public class Title : MonoBehaviour {
                 break;
             }
             case ArrowState.Settings: {
-                if(prevPageState != PageState.Settings)
+                // おかしい？
+                if(pageState != PageState.Settings)
                     pageState = PageState.Settings;
                 break;
             }
             case ArrowState.Howtoplay: {
-                if(prevPageState != PageState.HowToPlay)
+                if(pageState != PageState.HowToPlay)
                     pageState = PageState.HowToPlay;
                 break;
             }
