@@ -27,6 +27,8 @@ public class AudioController : MonoBehaviour
     {
         switch(bgmStatus) {
             case BGM.bgm: {
+                // 始まってなかったら帰る
+                if(MapController.systemStatus != MapController.SystemStatus.GameStarted) break;
                 if(PointManager.returningNest) { 
                     if(returningBgmFt) {
                         source.Stop();
@@ -60,26 +62,29 @@ public class AudioController : MonoBehaviour
                 break;
             }
             case BGM.opening: {
-                if (!(MapController.systemStatus == MapController.SystemStatus.WaitPlayOpening)) {
+                if (MapController.systemStatus != MapController.SystemStatus.WaitPlayOpening) {
                     break;
-                }
-                if(source.isPlaying) {
-                    break; /* 再生中なら帰る */
                 }
 
                 if (openingFt) {
+                    source.Stop();
                     source.Play();
                     break;
                 }
 
-                /* ゲームのステータスをすすめる */
-                MapController.systemStatus = MapController.SystemStatus.WaitOtherPlayer;
+                if(!source.isPlaying) {
+                    //break; /* 再生中なら帰る */
 
-                /* sourceをbgm用に変更 */
-                source.Stop();
-                source.clip = bgm;
-                source.loop = true;
-                bgmStatus = BGM.bgm;
+                    source.Stop();
+
+                    /* ゲームのステータスをすすめる */
+                    MapController.systemStatus = MapController.SystemStatus.WaitOtherPlayer;
+
+                    /* sourceをbgm用に変更 */
+                    source.clip = bgm;
+                    source.loop = true;
+                    bgmStatus = BGM.bgm;
+                }
 
                 break;
             }

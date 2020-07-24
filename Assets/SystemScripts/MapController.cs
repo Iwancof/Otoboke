@@ -73,11 +73,11 @@ public class MapController : MonoBehaviour {
             Logger.Log(Logger.CommunicationShowTag, "Count : " + playerCount);
             Logger.Log(Logger.CommunicationDebugTag, "Count : " + playerCount);
             //canPlayerAdd = true;
+            PointManager.log.text = "HELLO";
             doInMainThread(new MainThreadTransfer(() => {
                 Logger.Log(Logger.GameSystemProcTag, "Call add player" );
                 AddPlayer();
             }));
-
             systemStatus = SystemStatus.WaitPlayOpening;
         }, "CountPlayer");
 
@@ -162,6 +162,7 @@ public class MapController : MonoBehaviour {
                 return;
             }
             case SystemStatus.WaitPlayOpening: {
+                //PointManager.log.text = "AAAA";
                 /* waiting... */
                 /* AutoControllerのUpdate内で書き換わる。 */
                 return;

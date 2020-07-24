@@ -147,6 +147,7 @@ public class NetworksManager {
 
                 if (c == delim) {
                     //Debug.Log(sb.ToString());
+                    //PointManager.text += sb.ToString() + "\r\n";
                     ReadBuffer.Enqueue(sb.ToString());
 
                     sb.Clear();

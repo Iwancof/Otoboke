@@ -16,6 +16,7 @@ public class PointManager : MonoBehaviour
     Image img;
     Slider slider;
     Text timelimit;
+    public static Text log;
     GameObject ready;
     int prevBites;
 
@@ -34,13 +35,17 @@ public class PointManager : MonoBehaviour
         img = GameObject.Find("Canvas/Slider/FillArea/Fill").GetComponent<Image>();
         img.color = new Color(0, 255, 0);
         timelimit = GameObject.Find("Canvas/TimeLimit").GetComponent<Text>();
+        log = GameObject.Find("Canvas/LogText").GetComponent<Text>();
         ready = GameObject.Find("Canvas/READY");
         ready.SetActive(true);
+        log.text = "";
 
     }
+    public static string text = "";
 
     void Update()
     {
+        //log.text = text;//MapController.systemStatus.ToString();//"Time limit:" + (timeLimit).ToString("F1");
         if (MapController.systemStatus != MapController.SystemStatus.GameStarted) {
             timelimit.text = "Time limit:" + (timeLimit).ToString("F1");
             return;

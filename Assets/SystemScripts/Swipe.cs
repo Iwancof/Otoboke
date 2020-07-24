@@ -22,7 +22,6 @@ public class Swipe {
                 touchFlag = false;
             }
             if (Input.touches[0].phase == TouchPhase.Ended && !touchFlag) {
-                Debug.LogError("Lifted.");
                 liftedFingerPos = Input.touches[0].position;
                 touchFlag = true;
                 Vector2 dist = liftedFingerPos - touchedPos;

@@ -25,7 +25,7 @@ public class Title : MonoBehaviour {
 
     Vector2 swipeDir = Vector2.zero;
 
-    string ip = "35.188.97.54";
+    string ip = "192.168.179.2";//"35.188.97.54";
     int port = 5522;
 
     // Start is called before the first frame update
