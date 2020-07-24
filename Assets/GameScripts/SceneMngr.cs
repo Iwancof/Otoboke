@@ -55,8 +55,13 @@ public class SceneMngr : MonoBehaviour
     }
 
     // Update is called once per frame
+    Vector2 swipeDir = Vector2.zero;
+
     void Update()
     {
+        if(Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer) {
+            swipeDir = Swipe.SwipeDirection();
+        }
         switch(currentScene) {
             case SceneType.Title: {
                 if(Title.canStartGame) {
@@ -68,7 +73,7 @@ public class SceneMngr : MonoBehaviour
                 goto case SceneType.GameClear;
             }
             case SceneType.GameClear: {
-                if(Input.GetKeyDown(KeyCode.Return)) SceneManager.LoadSceneAsync("Title");
+                if(Input.GetKeyDown(KeyCode.Return) || swipeDir == Vector2.right) SceneManager.LoadSceneAsync("Title");
                 CheckBackToTitle();
                 break;
             }

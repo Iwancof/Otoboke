@@ -25,7 +25,7 @@ public class Title : MonoBehaviour {
 
     Vector2 swipeDir = Vector2.zero;
 
-    string ip = "192.168.179.2";//"35.188.97.54";
+    string ip = "35.188.97.54";
     int port = 5522;
 
     // Start is called before the first frame update
@@ -195,11 +195,14 @@ public class Title : MonoBehaviour {
                 break;
             }
             case ArrowState.Exit: {
+                bool editorFlag = false;
                 #if UNITY_EDITOR
+                editorFlag = true;
                 UnityEditor.EditorApplication.isPlaying = false;
-                #elif UNITY_STANDALONE
-                Application.Quit();
                 #endif
+                if(!editorFlag) {
+                    Application.Quit();
+                }
                 break;
             }
         }

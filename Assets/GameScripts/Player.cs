@@ -296,6 +296,6 @@ public class Player : MonoBehaviour {
             str += '\n';
         }
 
-        File.WriteAllText (Application.dataPath + "/mapdata.txt", str);
+        File.WriteAllText(Application.persistentDataPath + "/mapdata.txt", str);
     }
 }

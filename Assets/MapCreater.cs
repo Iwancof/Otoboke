@@ -173,7 +173,11 @@ public class Map {
         }
         //File.WriteAllText(Application.dataPath + "/mapdata.txt", str);
         
-        GameObject.FindWithTag("Player").GetComponent<Player>().RootSearch();
+        Player plyr = GameObject.FindWithTag("Player").GetComponent<Player>();
+        if(plyr != null) {
+            PointManager.log.text = MapController.systemStatus.ToString();
+            plyr.RootSearch();
+        }
 
         GameObject[] objects = GameObject.FindGameObjectsWithTag("Bait");
         PointManager.numOfBite = objects.Length;

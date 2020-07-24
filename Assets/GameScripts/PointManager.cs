@@ -23,6 +23,10 @@ public class PointManager : MonoBehaviour
     public static float gameStartTime;
     float timeLimit = 60;
     FirstTimeClass timerFt = new FirstTimeClass();
+    void Awake() {
+        log = GameObject.Find("Canvas/LogText").GetComponent<Text>();
+        log.text = "";
+    }
     void Start()
     {
         duration = 10;
@@ -35,10 +39,8 @@ public class PointManager : MonoBehaviour
         img = GameObject.Find("Canvas/Slider/FillArea/Fill").GetComponent<Image>();
         img.color = new Color(0, 255, 0);
         timelimit = GameObject.Find("Canvas/TimeLimit").GetComponent<Text>();
-        log = GameObject.Find("Canvas/LogText").GetComponent<Text>();
         ready = GameObject.Find("Canvas/READY");
         ready.SetActive(true);
-        log.text = "";
 
     }
     public static string text = "";
